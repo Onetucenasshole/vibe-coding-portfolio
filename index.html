@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LINDE · 林德创意化探索 — Vibe-coding 个人作品集</title>
+  <style>
+@font-face {
+	font-family: 'HarmonyOS Sans SC-Black';
+	font-style: normal;
+	font-weight: 900;
+	src: url(assets/fonts/HarmonyOS_Sans_SC_Black_1.ttf) format('truetype');
+}
+
+@font-face {
+	font-family: 'HarmonyOS Sans SC-Regular';
+	font-style: normal;
+	font-weight: 400;
+	src: url(assets/fonts/HarmonyOS_Sans_SC_Regular_1.ttf) format('truetype');
+}
+
+@font-face {
+	font-family: 'HarmonyOS Sans-Regular';
+	font-style: normal;
+	font-weight: 400;
+	src: url(assets/fonts/HarmonyOS_Sans_Regular_1.ttf) format('truetype');
+}
+
+@font-face {
+	font-family: 'SF Pro-Regular';
+	font-style: normal;
+	font-weight: 400;
+	src: url(assets/fonts/HarmonyOS_Sans_Regular_1.ttf) format('truetype');
+}
+</style>
+  <script src="js/animation.js"></script>
+  <style>
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+ol,ul,menu {
+  padding-inline-start: 0;
+  list-style: none;
+}
+
+ol li::marker, ul li::before {
+  letter-spacing: 0;
+}
+
+.scroll-container > div {
+  width: 100%;
+}
+
+.container > div {
+  width: 100%;
+}
+
+.Pixso-canvas-0_1 > div {
+  width: 100%;
+}
+
+html {
+  width: 100%;
+  height: 100%;
+}
+
+body { 
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  background-color: white;
+  overflow: hidden;
+}
+
+.site-viewport {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  position: relative;
+}
+
+.site-sizer {
+  margin: 0 auto;
+  position: relative;
+  width: 1920px;
+  height: 4386px;
+}
+    
+span {
+  word-break: break-word;
+}
+
+.container {
+  width: 100%;
+  height: 100%;
+}
+
+.scroll-container {
+  width: 1920px;
+  height: 4386px;
+  flex-shrink: 0;
+  transform-origin: top left;
+  transform: scale(var(--scale, 1));
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* 让整页缩放后的内容成为稳定的合成层，滚动时只平移、不再逐帧重绘大图 */
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.Pixso-canvas-0_1,.Pixso-frame-1232_1993 {
+  width: 1920px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.Pixso-canvas-0_1 {
+  height: 4386px;
+}
+
+.Pixso-frame-1232_1993 {
+  height: 4386px;
+  min-width: 1920px;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 1);
+  mix-blend-mode: normal;
+}
+
+.Pixso-frame-1232_1996,.Pixso-frame-1232_1997,.Pixso-rectangle-1232_1998,.Pixso-rectangle-1232_1999 {
+  width: 1920px;
+  position: absolute;
+  mix-blend-mode: normal;
+}
+
+.Pixso-frame-1232_1996,.Pixso-frame-1232_1997 {
+  height: 1080px;
+  left: 0px;
+}
+
+.Pixso-frame-1232_1996 {
+  top: 1px;
+}
+
+.Pixso-frame-1232_1997 {
+  overflow: hidden;
+  top: 0px;
+}
+
+.Pixso-rectangle-1232_1998 {
+  height: 1062px;
+  left: 50%;
+  top: 50%;
+  transform: translateX(calc(-50% + 0px)) translateY(calc(-50% + -9px));
+  background-size: 100.0000% 141.2429%;
+  background-position: 0.00px -210.00px;
+  background-repeat: no-repeat;
+  background-image: url("assets/images/eda28bc5007ac010a8849520f16335e2f1e77c33.png");
+}
+
+.Pixso-rectangle-1232_1999 {
+  height: 1080px;
+  left: 0px;
+  top: 0px;
+  backdrop-filter: blur(5px);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-position: center;
+  background-image: url("data:image/svg+xml;utf8,%3Csvg%20viewBox%3D'0%200%201920%201080'%20preserveAspectRatio%3D'none'%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%3E%0A%20%20%20%20%20%20%3Cdefs%3E%0A%20%20%20%20%20%20%20%20%3CradialGradient%20id%3D'grad'%20gradientUnits%3D'userSpaceOnUse'%20cx%3D'0'%20cy%3D'0'%20r%3D'1'%20gradientTransform%3D'matrix(-959.9999%2C%20-0.0000%2C%200.0000%2C%20-540.0000%2C%20959.9999%2C%20540.0000)'%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cstop%20stop-color%3D'rgba(0%2C0%2C0%2C0)'%20offset%3D'0'%2F%3E%3Cstop%20stop-color%3D'rgba(0%2C0%2C0%2C1)'%20offset%3D'1'%2F%3E%0A%20%20%20%20%20%20%20%20%3C%2FradialGradient%3E%0A%20%20%20%20%20%20%3C%2Fdefs%3E%0A%20%20%20%20%20%20%3Crect%20width%3D'100%25'%20height%3D'100%25'%20fill%3D'url(%23grad)'%2F%3E%0A%20%20%20%20%3C%2Fsvg%3E");
+}
+
+.Pixso-group-1232_2000 {
+  width: 1888px;
+  height: 852.432007px;
+  position: absolute;
+  left: 32px;
+  top: 28.567993px;
+  mix-blend-mode: normal;
+}
+
+.Pixso-frame-1298_2794,.frame-content-1298_2794,.Pixso-frame-1232_2001,.Pixso-frame-1232_2009 {
+  flex-direction: row;
+  align-items: center;
+}
+
+.Pixso-frame-1298_2794,.frame-content-1298_2794,.Pixso-frame-1232_2001 {
+  display: flex;
+}
+
+.Pixso-frame-1298_2794 {
+  width: 1538.25293px;
+  height: auto;
+  position: absolute;
+  left: 158px;
+  top: 0px;
+  justify-content: space-between;
+  mix-blend-mode: normal;
+}
+
+.frame-content-1298_2794 {
+  justify-content: space-between;
+  width: 100%;
+  position: relative;
+}
+
+.Pixso-frame-1232_2001 {
+  width: auto;
+  height: auto;
+  position: relative;
+  flex-shrink: 0;
+  gap: 17.072485px;
+  mix-blend-mode: normal;
+}
+
+.Pixso-vector-1232_2002,.Pixso-vector-1232_2003 {
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.Pixso-vector-1232_2002 {
+  width: 75.0115966796875px;
+  height: 63.4228515625px;
+  background-image: url("assets/images/Vector.svg");
+}
+
+.Pixso-vector-1232_2003 {
+  width: 108.9158935546875px;
+  height: 19.0673828125px;
+  background-image: url("assets/images/LINDE.svg");
+}
+
+.Pixso-frame-1232_2009,.Pixso-paragraph-1232_2010,.Pixso-paragraph-1232_2011,.Pixso-paragraph-1232_2012 {
+  width: auto;
+  height: auto;
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  mix-blend-mode: normal;
+}
+
+.Pixso-frame-1232_2009 {
+  gap: 159px;
+}
+
+.Pixso-paragraph-1232_2010,.Pixso-paragraph-1232_2011,.Pixso-paragraph-1232_2012,.Pixso-text-1232_2014,.Pixso-paragraph-1232_2015,.Pixso-paragraph-1232_2016,.Pixso-paragraph-1232_2017,.Pixso-paragraph-1232_2018,.Pixso-paragraph-1232_2019,.Pixso-text-1232_2039,.Pixso-text-1232_2040,.Pixso-paragraph-1232_2055,.Pixso-paragraph-1232_2057,.Pixso-paragraph-1232_2058,.Pixso-paragraph-1232_2059,.Pixso-text-1232_2067,.Pixso-paragraph-1232_2069,.Pixso-paragraph-1232_2071,.Pixso-paragraph-1232_2072,.Pixso-paragraph-1232_2074,.Pixso-paragraph-1232_2075,.Pixso-paragraph-1232_2077,.Pixso-paragraph-1232_2078,.Pixso-paragraph-1232_2080,.Pixso-paragraph-1232_2082,.Pixso-paragraph-1232_2083,.Pixso-paragraph-1232_2085,.Pixso-paragraph-1232_2086,.Pixso-paragraph-1232_2088,.Pixso-paragraph-1232_2089,.Pixso-paragraph-1232_2091,.Pixso-paragraph-1232_2093,.Pixso-paragraph-1232_2094,.Pixso-paragraph-1232_2096,.Pixso-paragraph-1232_2097,.Pixso-paragraph-1232_2099,.Pixso-paragraph-1232_2100 {
+  letter-spacing: 0em;
+  flex-grow: 0;
+}
+
+.Pixso-paragraph-1232_2010,.Pixso-paragraph-1232_2011,.Pixso-paragraph-1232_2012 {
+  font-size: 16px;
+  font-family: "HarmonyOS Sans SC-Regular";
+  font-weight: 400;
+  text-align: center;
+  flex-direction: column;
+  justify-content: center;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 1);
+  white-space: pre;
+}
+
+.Pixso-group-1232_2013 {
+  width: 1536.445313px;
+  height: 195px;
+  position: absolute;
+  left: 158px;
+  top: 146.432007px;
+  mix-blend-mode: normal;
+}
+
+.Pixso-text-1232_2014,.Pixso-paragraph-1232_2015,.Pixso-paragraph-1232_2016,.Pixso-paragraph-1232_2017,.Pixso-paragraph-1232_2018,.Pixso-paragraph-1232_2019 {
+  width: auto;
+  height: auto;
+}
+
+.Pixso-text-1232_2014 {
+  font-size: 12px;
+  font-family: "HarmonyOS Sans SC-Regular";
+  font-weight: Regular;
+  text-align: left;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 1);
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  white-space: nowrap;
+  mix-blend-mode: normal;
+}
+
+.Pixso-paragraph-1232_2014_0,.Pixso-span-1232_2014_0_1,.Pixso-paragraph-1232_2014_1,.Pixso-span-1232_2014_1_1,.Pixso-paragraph-1232_2014_2,.Pixso-span-1232_2014_2_1,.Pixso-paragraph-1232_2014_3,.Pixso-span-1232_2014_3_1 {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.Pixso-paragraph-1232_2014_0,.Pixso-paragraph-1232_2014_1,.Pixso-paragraph-1232_2014_2,.Pixso-paragraph-1232_2014_3,.Pixso-paragraph-1232_2039_0,.Pixso-paragraph-1232_2039_1,.Pixso-paragraph-1232_2039_2,.Pixso-paragraph-1232_2040_0,.Pixso-paragraph-1232_2040_1,.Pixso-paragraph-1232_2040_2,.Pixso-paragraph-1232_2040_3,.Pixso-paragraph-1232_2040_4 {
+  line-height: 14.063999px;
+}
+
+.Pixso-span-1232_2014_0_1,.Pixso-span-1232_2014_1_1,.Pixso-span-1232_2014_2_1,.Pixso-span-1232_2014_3_1 {
+  font-weight: 400;
+  text-decoration: none;
+}
+
+.Pixso-paragraph-1232_2015,.Pixso-paragraph-1232_2016,.Pixso-paragraph-1232_2017,.Pixso-paragraph-1232_2018,.Pixso-paragraph-1232_2019 {
+  font-family: "HarmonyOS Sans SC-Regular";
+  font-weight: 400;
+  text-align: left;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 1);
+  position: absolute;
+  white-space: pre;
+  mix-blend-mode: normal;
+}
+
+.Pixso-paragraph-1232_2015 {
+  font-size: 12px;
+  left: 172px;
+  top: 0px;
+}
+
+.Pixso-paragraph-1232_2016 {
+  font-size: 12px;
+  left: 0px;
+  top: 139px;
+}
+
+.Pixso-paragraph-1232_2017 {
+  font-size: 20px;
+  left: 172px;
+  top: 77px;
+}
+
+.Pixso-paragraph-1232_2018 {
+  font-size: 20px;
+  left: 574px;
+  top: 171px;
+}
+
+.Pixso-paragraph-1232_2019 {
+  font-size: 20px;
+  left: 0px;
+  top: 77px;
+}
+
+.Pixso-vector-1232_2020 {
+  width: 961.1641235351562px;
+  height: 142.2109375px;
+  background-image: url("assets/images/Group12.svg");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  position: absolute;
+  left: 575.28125px;
+  top: 1.046875px;
+}
+
+.Pixso-group-1232_2025,.Pixso-rectangle-1232_2026,.Pixso-rectangle-1232_2027,.Pixso-rectangle-1232_2028,.Pixso-rectangle-1232_2029,.Pixso-rectangle-1232_2030,.Pixso-rectangle-1232_2031,.Pixso-frame-1232_2033 {
+  position: absolute;
+  mix-blend-mode: normal;
+}
+
+.Pixso-group-1232_2025 {
+  width: 1888px;
+  height: 469px;
+  left: 0px;
+  top: 383.432007px;
+}
+
+.Pixso-rectangle-1232_2026,.Pixso-rectangle-1232_2027,.Pixso-rectangle-1232_2028,.Pixso-rectangle-1232_2029,.Pixso-rectangle-1232_2030 {
+  top: 102px;
+  background-color: rgba(193.70192, 193.70192, 193.70192, 1);
+}
+
+.Pixso-rectangle-1232_2026 {
+  width: 288px;
+  height: 367px;
+  left: 1044px;
+}
+
+.Pixso-rectangle-1232_2027 {
+  width: 288px;
+  height: 186px;
+  left: 1356px;
+}
+
+.Pixso-rectangle-1232_2028 {
+  width: 220px;
+  height: 186px;
+  left: 1668px;
+}
+
+.Pixso-rectangle-1232_2029 {
+  width: 288px;
+  height: 186px;
+  left: 732px;
+}
+
+.Pixso-rectangle-1232_2030 {
+  width: 288px;
+  height: 186px;
+  left: 0px;
+}
+
+.Pixso-rectangle-1232_2031 {
+  width: 288px;
+  height: 288px;
+  left: 316px;
+  top: 0px;
+  background-color: rgba(193.70192, 193.70192, 193.70192, 1);
+}
+
+.Pixso-frame-1232_2033,.frame-content-1232_2033 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.Pixso-frame-1232_2033 {
+  width: 131.611298px;
+  height: 139px;
+  left: 158px;
+  top: 713.431641px;
+  background-color: rgba(226.189896, 226.189896, 226.189896, 1);
+}
+
+.frame-content-1232_2033 {
+  gap: 4.61794px;
+  padding: 4.61794px 4.61794px 4.61794px 4.61794px;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.Pixso-rectangle-1232_2034,.Pixso-vector-1232_2035 {
+  position: relative;
+  flex-shrink: 0;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+.Pixso-rectangle-1232_2034 {
+  width: 104.688705px;
+  height: 104.688705px;
+  background-position: center;
+  background-image: url("assets/images/03be4783fd55ba13012fa59c2ab0e5e5b68a0ac5.png");
+  mix-blend-mode: normal;
+}
+
+.Pixso-vector-1232_2035 {
+  width: 114.415283203125px;
+  height: 21.8515625px;
+  background-image: url("assets/images/Frame29.svg");
+  display: flex;
+  flex-direction: row;
+  gap: 9.23588px;
+  align-items: flex-end;
+}
+
+.Pixso-frame-11_3144,.frame-content-11_3144 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.Pixso-frame-11_3144 {
+  width: 468px;
+  height: auto;
+  position: absolute;
+  left: 315.611328px;
+  top: 713.431641px;
+  mix-blend-mode: normal;
+}
+
+.frame-content-11_3144 {
+  gap: 27px;
+  width: 100%;
+  position: relative;
+}
+
+.Pixso-text-1232_2039,.Pixso-paragraph-1232_2039_0,.Pixso-span-1232_2039_0_1,.Pixso-paragraph-1232_2039_1,.Pixso-span-1232_2039_1_1,.Pixso-paragraph-1232_2039_2,.Pixso-span-1232_2039_2_1,.Pixso-text-1232_2040,.Pixso-paragraph-1232_2040_0,.Pixso-span-1232_2040_0_1,.Pixso-paragraph-1232_2040_1,.Pixso-span-1232_2040_1_1,.Pixso-paragraph-1232_2040_2,.Pixso-span-1232_2040_2_1,.Pixso-paragraph-1232_2040_3,.Pixso-span-1232_2040_3_1,.Pixso-paragraph-1232_2040_4,.Pixso-span-1232_2040_4_1 {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.Pixso-text-1232_2039 {
+  font-size: 12px;
+  font-family: "HarmonyOS Sans SC-Regular";
+  font-weight: Regular;
+  text-align: left;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 1);
+  width: 100%;
+  height: auto;
+  mix-blend-mode: normal;
+}
+
+.Pixso-span-1232_2039_0_1,.Pixso-span-1232_2039_1_1,.Pixso-span-1232_2039_2_1 {
+  font-weight: 400;
+  text-decoration: none;
+}
+
+.Pixso-text-1232_2040 {
+  font-size: 12px;
+  font-family: "HarmonyOS Sans SC-Regular";
+  font-weight: Regular;
+  text-align: left;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 1);
+  width: 100%;
+  height: auto;
+  mix-blend-mode: normal;
+}
+
+.Pixso-span-1232_2040_0_1,.Pixso-span-1232_2040_1_1,.Pixso-span-1232_2040_2_1,.Pixso-span-1232_2040_3_1,.Pixso-span-1232_2040_4_1 {
+  font-weight: 400;
+  text-decoration: none;
+}
+
+.Pixso-rectangle-1232_2041 {
+  width: 154px;
+  height: 36px;
+  position: absolute;
+  left: 1542px;
+  top: 816.431641px;
+  background-size: 100.0000% 107.0290%;
+  background-position: 0.00px -0.12px;
+  background-repeat: no-repeat;
+  background-image: url("assets/images/af4e9129eec1585d7b42cf742da755e5e6fe2f2a.png");
+  mix-blend-mode: normal;
+}
+
+.Pixso-vector-11_3097 {
+  width: 1920px;
+  height: 2376.2216796875px;
+  background-image: url("assets/images/Frame_11_3097_filled_1x.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translateX(calc(-50% + 0px)) translateY(calc(-50% + 58.11083984375px));
+  will-change: transform;
+}
+
+.Pixso-group-1232_2051 {
+  width: 1440px;
+  height: 868px;
+  position: absolute;
+  left: 50%;
+  top: 3518px;
+  transform: translateX(calc(-50% + 0px));
+  mix-blend-mode: normal;
+}
+
+.Pixso-vector-1232_2052 {
+  width: 1440px;
+  height: 603px;
+  background-image: url("assets/images/Frame859.svg");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  position: absolute;
+  left: 0px;
+  top: 265px;
+}
+
+.Pixso-paragraph-1232_2055,.Pixso-frame-1232_2056,.Pixso-paragraph-1232_2057,.Pixso-paragraph-1232_2058,.Pixso-paragraph-1232_2059 {
+  width: auto;
+  height: auto;
+  mix-blend-mode: normal;
+}
+
+.Pixso-paragraph-1232_2055,.Pixso-paragraph-1232_2057,.Pixso-paragraph-1232_2058,.Pixso-paragraph-1232_2059 {
+  font-size: 15px;
+  font-family: "SF Pro-Regular";
+}
+
+.Pixso-paragraph-1232_2055 {
+  font-weight: 400;
+  text-align: left;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 1);
+  white-space: pre;
+  position: absolute;
+  left: 120px;
+  top: 820.999878px;
+}
+
+.Pixso-frame-1232_2056 {
+  position: absolute;
+  left: 1076px;
+  top: 821.000061px;
+  display: flex;
+  flex-direction: row;
+  gap: 50px;
+  align-items: center;
+}
+
+.Pixso-paragraph-1232_2057,.Pixso-paragraph-1232_2058,.Pixso-paragraph-1232_2059 {
+  font-weight: 400;
+  text-align: left;
+  text-decoration: none;
+  position: relative;
+  flex-shrink: 0;
+  white-space: pre;
+}
+
+.Pixso-paragraph-1232_2057 {
+  color: rgba(255, 0, 0, 1);
+}
+
+.Pixso-paragraph-1232_2058 {
+  color: rgba(0, 80.75, 255, 1);
+}
+
+.Pixso-paragraph-1232_2059 {
+  color: rgba(255, 255, 255, 1);
+}
+
+.Pixso-vector-5_1404 {
+  width: 837.2527465820312px;
+  height: 198.9375px;
+  background-image: url("assets/images/Group_5_1404.svg");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  position: absolute;
+  left: 121px;
+  top: 0px;
+}
+
+.Pixso-frame-1358_3157 {
+  width: auto;
+  height: auto;
+  position: absolute;
+  left: 120px;
+  top: 404.000061px;
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  align-items: center;
+  mix-blend-mode: normal;
+}
+
+.Pixso-vector-1232_2064,.Pixso-vector-11_3094 {
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.Pixso-vector-1232_2064 {
+  width: 65.0384521484375px;
+  height: 54.990234375px;
+  background-image: url("assets/images/Frame.svg");
+  display: flex;
+  flex-direction: column;
+  gap: 13.456921px;
+  align-items: flex-start;
+}
+
+.Pixso-vector-11_3094 {
+  width: 94.43499755859375px;
+  height: 16.5322265625px;
+  background-image: url("assets/images/Vector_11_3094.svg");
+}
+
+.Pixso-text-1232_2067 {
+  font-size: 14px;
+  font-family: "HarmonyOS Sans-Regular";
+  font-weight: Regular;
+  text-align: left;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 1);
+  width: auto;
+  height: auto;
+  position: absolute;
+  left: 120px;
+  top: 492.000061px;
+  white-space: nowrap;
+  mix-blend-mode: normal;
+}
+
+.Pixso-paragraph-1232_2067_0,.Pixso-span-1232_2067_0_1,.Pixso-paragraph-1232_2067_1,.Pixso-span-1232_2067_1_1 {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.Pixso-paragraph-1232_2067_0,.Pixso-paragraph-1232_2067_1 {
+  line-height: 16.407999px;
+}
+
+.Pixso-span-1232_2067_0_1,.Pixso-span-1232_2067_1_1 {
+  font-weight: 400;
+  text-decoration: none;
+}
+
+.Pixso-frame-5_1392,.Pixso-frame-1232_2068 {
+  height: auto;
+  display: flex;
+  align-items: flex-start;
+  mix-blend-mode: normal;
+}
+
+.Pixso-frame-5_1392 {
+  width: auto;
+  position: absolute;
+  left: 464px;
+  top: 404px;
+  flex-direction: row;
+  gap: 42px;
+}
+
+.Pixso-frame-1232_2068 {
+  width: 98px;
+  position: relative;
+  flex-shrink: 0;
+  flex-direction: column;
+}
+
+.frame-content-1232_2068 {
+  display: flex;
+  flex-direction: column;
+  gap: 52px;
+  align-items: flex-start;
+  width: 100%;
+  position: relative;
+}
+
+.Pixso-paragraph-1232_2069,.Pixso-frame-1232_2070,.Pixso-paragraph-1232_2071,.Pixso-paragraph-1232_2072,.Pixso-frame-1232_2073,.Pixso-paragraph-1232_2074,.Pixso-paragraph-1232_2075 {
+  width: auto;
+  height: auto;
+  position: relative;
+  flex-shrink: 0;
+  mix-blend-mode: normal;
+}
+
+.Pixso-paragraph-1232_2069 {
+  font-size: 16px;
+  font-family: "HarmonyOS Sans SC-Black";
+  font-weight: 900;
+  text-align: left;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 1);
+  white-space: pre;
+}
+
+.Pixso-frame-1232_2070,.Pixso-frame-1232_2073 {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.Pixso-paragraph-1232_2071,.Pixso-paragraph-1232_2072,.Pixso-paragraph-1232_2074,.Pixso-paragraph-1232_2075 {
+  font-size: 14px;
+  text-align: left;
+  text-decoration: none;
+  white-space: pre;
+}
+
+.Pixso-paragraph-1232_2071 {
+  font-family: "HarmonyOS Sans SC-Regular";
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.Pixso-paragraph-1232_2072 {
+  font-family: "HarmonyOS Sans SC-Black";
+  font-weight: 900;
+  color: rgba(255, 255, 255, 1);
+}
+
+.Pixso-paragraph-1232_2074 {
+  font-family: "HarmonyOS Sans SC-Regular";
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.Pixso-paragraph-1232_2075 {
+  font-family: "HarmonyOS Sans SC-Black";
+  font-weight: 900;
+  color: rgba(255, 255, 255, 1);
+}
+
+.Pixso-frame-1232_2076,.frame-content-1232_2076 {
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.Pixso-frame-1232_2076 {
+  height: auto;
+  flex-shrink: 0;
+  mix-blend-mode: normal;
+}
+
+.frame-content-1232_2076 {
+  gap: 10px;
+}
+
+.Pixso-paragraph-1232_2077,.Pixso-paragraph-1232_2078 {
+  font-size: 14px;
+  text-align: left;
+  text-decoration: none;
+  width: auto;
+  height: auto;
+  position: relative;
+  flex-shrink: 0;
+  white-space: pre;
+  mix-blend-mode: normal;
+}
+
+.Pixso-paragraph-1232_2077 {
+  font-family: "HarmonyOS Sans SC-Regular";
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.Pixso-paragraph-1232_2078,.Pixso-paragraph-1232_2080 {
+  font-family: "HarmonyOS Sans SC-Black";
+  font-weight: 900;
+  color: rgba(255, 255, 255, 1);
+}
+
+.Pixso-frame-1232_2079,.frame-content-1232_2079 {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.Pixso-frame-1232_2079 {
+  width: 165px;
+  height: auto;
+  flex-shrink: 0;
+  mix-blend-mode: normal;
+}
+
+.frame-content-1232_2079 {
+  gap: 52px;
+  width: 100%;
+}
+
+.Pixso-paragraph-1232_2080,.Pixso-frame-1232_2081 {
+  height: auto;
+  position: relative;
+  flex-shrink: 0;
+  mix-blend-mode: normal;
+}
+
+.Pixso-paragraph-1232_2080 {
+  font-size: 16px;
+  text-align: left;
+  text-decoration: none;
+  width: auto;
+  white-space: pre;
+}
+
+.Pixso-frame-1232_2081,.frame-content-1232_2081 {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.frame-content-1232_2081 {
+  gap: 10px;
+  position: relative;
+}
+
+.Pixso-paragraph-1232_2082,.Pixso-paragraph-1232_2083,.Pixso-frame-1232_2084,.Pixso-paragraph-1232_2085,.Pixso-paragraph-1232_2086,.Pixso-frame-1232_2087,.Pixso-paragraph-1232_2088,.Pixso-paragraph-1232_2089 {
+  width: auto;
+  height: auto;
+  position: relative;
+  flex-shrink: 0;
+  mix-blend-mode: normal;
+}
+
+.Pixso-paragraph-1232_2082,.Pixso-paragraph-1232_2083,.Pixso-paragraph-1232_2085,.Pixso-paragraph-1232_2086 {
+  font-size: 14px;
+  text-align: left;
+  text-decoration: none;
+  white-space: pre;
+}
+
+.Pixso-paragraph-1232_2082 {
+  font-family: "HarmonyOS Sans SC-Regular";
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.Pixso-paragraph-1232_2083 {
+  font-family: "HarmonyOS Sans SC-Black";
+  font-weight: 900;
+  color: rgba(255, 255, 255, 1);
+}
+
+.Pixso-frame-1232_2084,.Pixso-frame-1232_2087 {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.Pixso-paragraph-1232_2085 {
+  font-family: "HarmonyOS Sans SC-Regular";
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.Pixso-paragraph-1232_2086 {
+  font-family: "HarmonyOS Sans SC-Black";
+  font-weight: 900;
+  color: rgba(255, 255, 255, 1);
+}
+
+.Pixso-paragraph-1232_2088 {
+  font-size: 14px;
+  font-family: "HarmonyOS Sans SC-Regular";
+  font-weight: 400;
+  text-align: left;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: pre;
+}
+
+.Pixso-paragraph-1232_2089,.Pixso-paragraph-1232_2091 {
+  font-family: "HarmonyOS Sans SC-Black";
+  font-weight: 900;
+  color: rgba(255, 255, 255, 1);
+}
+
+.Pixso-paragraph-1232_2089 {
+  font-size: 14px;
+  text-align: left;
+  text-decoration: none;
+  white-space: pre;
+}
+
+.Pixso-frame-1232_2090,.frame-content-1232_2090 {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.Pixso-frame-1232_2090 {
+  width: 193px;
+  height: auto;
+  flex-shrink: 0;
+  mix-blend-mode: normal;
+}
+
+.frame-content-1232_2090 {
+  gap: 52px;
+  width: 100%;
+}
+
+.Pixso-paragraph-1232_2091,.Pixso-frame-1232_2092,.Pixso-paragraph-1232_2093,.Pixso-paragraph-1232_2094,.Pixso-frame-1232_2095,.Pixso-paragraph-1232_2096,.Pixso-paragraph-1232_2097 {
+  width: auto;
+  height: auto;
+  position: relative;
+  flex-shrink: 0;
+  mix-blend-mode: normal;
+}
+
+.Pixso-paragraph-1232_2091 {
+  font-size: 16px;
+  text-align: left;
+  text-decoration: none;
+  white-space: pre;
+}
+
+.Pixso-frame-1232_2092,.Pixso-frame-1232_2095 {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.Pixso-paragraph-1232_2093,.Pixso-paragraph-1232_2094,.Pixso-paragraph-1232_2096,.Pixso-paragraph-1232_2097 {
+  font-size: 14px;
+  text-align: left;
+  text-decoration: none;
+  white-space: pre;
+}
+
+.Pixso-paragraph-1232_2093 {
+  font-family: "HarmonyOS Sans SC-Regular";
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.Pixso-paragraph-1232_2094 {
+  font-family: "HarmonyOS Sans SC-Black";
+  font-weight: 900;
+  color: rgba(255, 255, 255, 1);
+}
+
+.Pixso-paragraph-1232_2096 {
+  font-family: "HarmonyOS Sans SC-Regular";
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.Pixso-paragraph-1232_2097 {
+  font-family: "HarmonyOS Sans SC-Black";
+  font-weight: 900;
+  color: rgba(255, 255, 255, 1);
+}
+
+.Pixso-frame-1232_2098,.frame-content-1232_2098 {
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.Pixso-frame-1232_2098 {
+  height: auto;
+  flex-shrink: 0;
+  mix-blend-mode: normal;
+}
+
+.frame-content-1232_2098 {
+  gap: 10px;
+}
+
+.Pixso-paragraph-1232_2099,.Pixso-paragraph-1232_2100 {
+  font-size: 14px;
+  text-align: left;
+  text-decoration: none;
+  width: auto;
+  height: auto;
+  position: relative;
+  flex-shrink: 0;
+  white-space: pre;
+  mix-blend-mode: normal;
+}
+
+.Pixso-paragraph-1232_2099 {
+  font-family: "HarmonyOS Sans SC-Regular";
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.Pixso-paragraph-1232_2100 {
+  font-family: "HarmonyOS Sans SC-Black";
+  font-weight: 900;
+  color: rgba(255, 255, 255, 1);
+}
+
+.Pixso-rectangle-1232_2101 {
+  width: 180px;
+  height: 236px;
+  position: absolute;
+  left: 120px;
+  top: 548.000061px;
+  background-color: transparent;
+  opacity: 0.45;
+  mix-blend-mode: normal;
+}
+
+.Pixso-rectangle-1232_2102 {
+  width: 328px;
+  height: 805px;
+  position: absolute;
+  left: 1055px;
+  top: 0.000046px;
+  background-size: 180.1568% 124.6808%;
+  background-position: -109.62px -100.20px;
+  background-repeat: no-repeat;
+  background-image: url("assets/images/10b940b14961db90eed10bec5ddb63ab12bb0a72.png");
+  mix-blend-mode: normal;
+}
+
+
+  /* ===================== Animations ===================== */
+  @media (prefers-reduced-motion: no-preference) {
+    /* 首屏入场：Hero 区加载时淡入上移 */
+    .hero-enter {
+      animation: heroIn 1.1s cubic-bezier(.22, .61, .36, 1) both;
+    }
+    @keyframes heroIn {
+      from { opacity: 0; transform: translateY(34px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 滚动揭示：进入视口时淡入上移 */
+    .reveal {
+      opacity: 0;
+      transform: translateY(42px);
+      transition: opacity .9s ease, transform .9s cubic-bezier(.22, .61, .36, 1);
+    }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+
+    /* 纯透明度揭示（用于本身已带 transform 定位的元素，避免覆盖） */
+    .reveal-fade {
+      opacity: 0;
+      transition: opacity 1.1s ease;
+    }
+    .reveal-fade.in { opacity: 1; }
+  }
+
+  /* 悬停微交互：导航链接 */
+  .Pixso-paragraph-1232_2010,
+  .Pixso-paragraph-1232_2011,
+  .Pixso-paragraph-1232_2012 {
+    transition: opacity .3s ease, transform .3s ease;
+  }
+  .Pixso-paragraph-1232_2010:hover,
+  .Pixso-paragraph-1232_2011:hover,
+  .Pixso-paragraph-1232_2012:hover {
+    opacity: .65;
+    transform: translateY(-2px);
+  }
+
+  /* 悬停微交互：页脚社媒链接 */
+  .Pixso-paragraph-1232_2057,
+  .Pixso-paragraph-1232_2058,
+  .Pixso-paragraph-1232_2059 {
+    transition: transform .3s ease, filter .3s ease;
+    cursor: pointer;
+  }
+  .Pixso-paragraph-1232_2057:hover,
+  .Pixso-paragraph-1232_2058:hover,
+  .Pixso-paragraph-1232_2059:hover {
+    transform: translateY(-3px);
+    filter: brightness(1.18);
+  }
+
+
+  </style>
+</head>
+<body>
+<div class="site-viewport">
+<div class="site-sizer">
+<div class="scroll-container">
+  <div id="0_1" class="Pixso-canvas-0_1">
+    <div id="1232_1993" class="Pixso-frame-1232_1993">
+      <div id="1232_1996" class="Pixso-frame-1232_1996">
+        <div id="1232_1997" class="Pixso-frame-1232_1997">
+          <div id="1232_1998" class="Pixso-rectangle-1232_1998"></div>
+          <div id="1232_1999" class="Pixso-rectangle-1232_1999"></div>
+        </div>
+        <div id="1232_2000" class="Pixso-group-1232_2000">
+          <div id="1298_2794" class="Pixso-frame-1298_2794">
+            <div class="frame-content-1298_2794">
+              <div id="1232_2001" class="Pixso-frame-1232_2001">
+                <div id="1232_2002" class="Pixso-vector-1232_2002"></div>
+                <div id="1232_2003" class="Pixso-vector-1232_2003"></div>
+              </div>
+              <div id="1232_2009" class="Pixso-frame-1232_2009">
+                <p id="1232_2010" class="Pixso-paragraph-1232_2010">LIND PORTFOLIO (BLIND BOX)</p>
+                <p id="1232_2011" class="Pixso-paragraph-1232_2011">Work</p>
+                <p id="1232_2012" class="Pixso-paragraph-1232_2012">Vibe-coding项目</p>
+              </div>
+            </div>
+          </div>
+          <div id="1232_2013" class="Pixso-group-1232_2013">
+            <div id="1232_2014" class="Pixso-text-1232_2014">
+              <p id="1232_2014_0" class="Pixso-paragraph-1232_2014_0">
+<span id="1232_2014_0_1" class="Pixso-span-1232_2014_0_1">LINDE@</span></p>
+              <p id="1232_2014_1" class="Pixso-paragraph-1232_2014_1">
+<span id="1232_2014_1_1" class="Pixso-span-1232_2014_1_1">STORY BOOK2012</span></p>
+              <p id="1232_2014_2" class="Pixso-paragraph-1232_2014_2">
+<span id="1232_2014_2_1" class="Pixso-span-1232_2014_2_1">STUDIO EDITED</span></p>
+              <p id="1232_2014_3" class="Pixso-paragraph-1232_2014_3">
+<span id="1232_2014_3_1" class="Pixso-span-1232_2014_3_1">DESIGNE STORY</span></p>
+            </div>
+            <p id="1232_2015" class="Pixso-paragraph-1232_2015">2027</p>
+            <p id="1232_2016" class="Pixso-paragraph-1232_2016">FUTURE</p>
+            <p id="1232_2017" class="Pixso-paragraph-1232_2017">Creative Story &amp; Collection</p>
+            <p id="1232_2018" class="Pixso-paragraph-1232_2018">This is where art, AI, and antiquity converge.</p>
+            <p id="1232_2019" class="Pixso-paragraph-1232_2019">DESIGNE</p>
+            <div id="1232_2020" class="Pixso-vector-1232_2020"></div>
+          </div>
+          <div id="1232_2025" class="Pixso-group-1232_2025">
+            <div id="1232_2026" class="Pixso-rectangle-1232_2026" style="cursor: pointer;"></div>
+            <div id="1232_2027" class="Pixso-rectangle-1232_2027" style="cursor: pointer;"></div>
+            <div id="1232_2028" class="Pixso-rectangle-1232_2028"></div>
+            <div id="1232_2029" class="Pixso-rectangle-1232_2029"></div>
+            <div id="1232_2030" class="Pixso-rectangle-1232_2030"></div>
+            <div id="1232_2031" class="Pixso-rectangle-1232_2031"></div>
+          </div>
+          <div id="1232_2033" class="Pixso-frame-1232_2033">
+            <div class="frame-content-1232_2033">
+              <div id="1232_2034" class="Pixso-rectangle-1232_2034"></div>
+              <div id="1232_2035" class="Pixso-vector-1232_2035"></div>
+            </div>
+          </div>
+          <div id="11_3144" class="Pixso-frame-11_3144">
+            <div class="frame-content-11_3144">
+              <div id="1232_2039" class="Pixso-text-1232_2039">
+                <p id="1232_2039_0" class="Pixso-paragraph-1232_2039_0">
+<span id="1232_2039_0_1" class="Pixso-span-1232_2039_0_1">We embark on a journey where art meets intelligence, where the golden ratios </span></p>
+                <p id="1232_2039_1" class="Pixso-paragraph-1232_2039_1">
+<span id="1232_2039_1_1" class="Pixso-span-1232_2039_1_1">of the past converse with the neural networks of now. Here, creation is not merely </span></p>
+                <p id="1232_2039_2" class="Pixso-paragraph-1232_2039_2">
+<span id="1232_2039_2_1" class="Pixso-span-1232_2039_2_1">computational—it is alchemical.</span></p>
+              </div>
+              <div id="1232_2040" class="Pixso-text-1232_2040">
+                <p id="1232_2040_0" class="Pixso-paragraph-1232_2040_0">
+<span id="1232_2040_0_1" class="Pixso-span-1232_2040_0_1">Following The Traces Of Tomorrow, Embarking On The Journey Of IntelligentCreation, </span></p>
+                <p id="1232_2040_1" class="Pixso-paragraph-1232_2040_1">
+<span id="1232_2040_1_1" class="Pixso-span-1232_2040_1_1">Wandering In The Boundless Realm Of Al Design. DeconstructVisual Logic And </span></p>
+                <p id="1232_2040_2" class="Pixso-paragraph-1232_2040_2">
+<span id="1232_2040_2_1" class="Pixso-span-1232_2040_2_1">Reshape Aesthetic Rules, Integrate Creative Inspiration WithComputational Power, </span></p>
+                <p id="1232_2040_3" class="Pixso-paragraph-1232_2040_3">
+<span id="1232_2040_3_1" class="Pixso-span-1232_2040_3_1">Explore Endless Design Possibilities Across DigitalDimensions. Break Through Stylistic </span></p>
+                <p id="1232_2040_4" class="Pixso-paragraph-1232_2040_4">
+<span id="1232_2040_4_1" class="Pixso-span-1232_2040_4_1">Limits And Shatter</span></p>
+              </div>
+            </div>
+          </div>
+          <div id="1232_2041" class="Pixso-rectangle-1232_2041"></div>
+        </div>
+      </div>
+      <div id="11_3097" class="Pixso-vector-11_3097 reveal-fade">
+      </div>
+      <div id="1232_2051" class="Pixso-group-1232_2051">
+        <div id="1232_2052" class="Pixso-vector-1232_2052 reveal"></div>
+        <p id="1232_2055" class="Pixso-paragraph-1232_2055 reveal">@2026  LIND · 林德创意化探索</p>
+        <div id="1232_2056" class="Pixso-frame-1232_2056 reveal">
+          <p id="1232_2057" class="Pixso-paragraph-1232_2057">小红书</p>
+          <p id="1232_2058" class="Pixso-paragraph-1232_2058">Design</p>
+          <p id="1232_2059" class="Pixso-paragraph-1232_2059">GitHub</p>
+        </div>
+        <div id="5_1404" class="Pixso-vector-5_1404 reveal"></div>
+        <div id="1358_3157" class="Pixso-frame-1358_3157">
+          <div id="1232_2064" class="Pixso-vector-1232_2064"></div>
+          <div id="11_3094" class="Pixso-vector-11_3094"></div>
+        </div>
+        <div id="1232_2067" class="Pixso-text-1232_2067 reveal">
+          <p id="1232_2067_0" class="Pixso-paragraph-1232_2067_0">
+<span id="1232_2067_0_1" class="Pixso-span-1232_2067_0_1">浪潮中思考与判断力愈发不可替代，</span></p>
+          <p id="1232_2067_1" class="Pixso-paragraph-1232_2067_1">
+<span id="1232_2067_1_1" class="Pixso-span-1232_2067_1_1">无比的想象力和执行力才是Ai时代的人的核心。</span></p>
+        </div>
+        <div id="5_1392" class="Pixso-frame-5_1392">
+          <div id="1232_2068" class="Pixso-frame-1232_2068 reveal">
+            <div class="frame-content-1232_2068">
+              <p id="1232_2069" class="Pixso-paragraph-1232_2069">个人信息</p>
+              <div id="1232_2070" class="Pixso-frame-1232_2070">
+                <p id="1232_2071" class="Pixso-paragraph-1232_2071">身份</p>
+                <p id="1232_2072" class="Pixso-paragraph-1232_2072">創意探索者</p>
+              </div>
+              <div id="1232_2073" class="Pixso-frame-1232_2073">
+                <p id="1232_2074" class="Pixso-paragraph-1232_2074">方向</p>
+                <p id="1232_2075" class="Pixso-paragraph-1232_2075">AI創意</p>
+              </div>
+              <div id="1232_2076" class="Pixso-frame-1232_2076">
+                <div class="frame-content-1232_2076">
+                  <p id="1232_2077" class="Pixso-paragraph-1232_2077">状态</p>
+                  <p id="1232_2078" class="Pixso-paragraph-1232_2078">AI时代探索中</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="1232_2079" class="Pixso-frame-1232_2079 reveal">
+            <div class="frame-content-1232_2079">
+              <p id="1232_2080" class="Pixso-paragraph-1232_2080">社媒主页</p>
+              <div id="1232_2081" class="Pixso-frame-1232_2081">
+                <div class="frame-content-1232_2081">
+                  <p id="1232_2082" class="Pixso-paragraph-1232_2082">Redbook</p>
+                  <p id="1232_2083" class="Pixso-paragraph-1232_2083">JIANG7SHU9CHORD</p>
+                </div>
+              </div>
+              <div id="1232_2084" class="Pixso-frame-1232_2084">
+                <p id="1232_2085" class="Pixso-paragraph-1232_2085">Design</p>
+                <p id="1232_2086" class="Pixso-paragraph-1232_2086">暫無</p>
+              </div>
+              <div id="1232_2087" class="Pixso-frame-1232_2087">
+                <p id="1232_2088" class="Pixso-paragraph-1232_2088">微博/抖音</p>
+                <p id="1232_2089" class="Pixso-paragraph-1232_2089">暫無</p>
+              </div>
+            </div>
+          </div>
+          <div id="1232_2090" class="Pixso-frame-1232_2090 reveal">
+            <div class="frame-content-1232_2090">
+              <p id="1232_2091" class="Pixso-paragraph-1232_2091">联系我</p>
+              <div id="1232_2092" class="Pixso-frame-1232_2092">
+                <p id="1232_2093" class="Pixso-paragraph-1232_2093">email</p>
+                <p id="1232_2094" class="Pixso-paragraph-1232_2094">891001624@qq.com</p>
+              </div>
+              <div id="1232_2095" class="Pixso-frame-1232_2095">
+                <p id="1232_2096" class="Pixso-paragraph-1232_2096">Wechat</p>
+                <p id="1232_2097" class="Pixso-paragraph-1232_2097">Yogaaaaaaaaaaaaaa</p>
+              </div>
+              <div id="1232_2098" class="Pixso-frame-1232_2098">
+                <div class="frame-content-1232_2098">
+                  <p id="1232_2099" class="Pixso-paragraph-1232_2099">合作咨询</p>
+                  <p id="1232_2100" class="Pixso-paragraph-1232_2100">欢迎通过邮箱或者社媒联系</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="1232_2101" class="Pixso-rectangle-1232_2101"></div>
+        <div id="1232_2102" class="Pixso-rectangle-1232_2102"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+</div>
+
+
+<script>
+(function () {
+  var BASE_W = 1920;
+  var BASE_H = 4386;
+  var sizer = document.querySelector('.site-sizer');
+  var scroller = document.querySelector('.scroll-container');
+  function fit() {
+    var w = window.innerWidth;
+    var scale = Math.min(w / BASE_W, 1);
+    scroller.style.setProperty('--scale', scale.toFixed(4));
+    sizer.style.width = (BASE_W * scale) + 'px';
+    sizer.style.height = (BASE_H * scale) + 'px';
+  }
+  window.addEventListener('resize', fit);
+  fit();
+
+  // 滚动揭示：进入视口时加上 .in
+  var vp = document.querySelector('.site-viewport');
+  var reveals = Array.prototype.slice.call(document.querySelectorAll('.reveal, .reveal-fade'));
+
+  // 页脚模块错落延迟（按在页脚容器内的先后顺序）
+  var footer = document.getElementById('1232_2051');
+  if (footer) {
+    var fItems = footer.querySelectorAll('.reveal');
+    for (var k = 0; k < fItems.length; k++) {
+      fItems[k].style.transitionDelay = (k * 90) + 'ms';
+    }
+  }
+
+  var ticking = false;
+  function revealCheck() {
+    var h = vp.clientHeight || window.innerHeight;
+    var pending = 0;
+    for (var i = 0; i < reveals.length; i++) {
+      var el = reveals[i];
+      if (el.classList.contains('in')) continue;
+      var r = el.getBoundingClientRect();
+      if (r.top < h * 0.86 && r.bottom > 0) el.classList.add('in');
+      else pending++;
+    }
+    // 全部揭示后卸载滚动监听，避免长期占用滚动帧
+    if (pending === 0) vp.removeEventListener('scroll', onScroll);
+    ticking = false;
+  }
+  function onScroll() {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(revealCheck);
+    }
+  }
+  vp.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', function () {
+    revealCheck();
+    // resize 后若仍有未揭示元素，重新挂上滚动监听
+    var stillPending = reveals.some(function (e) { return !e.classList.contains('in'); });
+    if (stillPending) vp.addEventListener('scroll', onScroll, { passive: true });
+  });
+  revealCheck();
+})();
+</script>
+
+</body>
+</html>

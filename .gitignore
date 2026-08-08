@@ -1,0 +1,18 @@
+# 未引用/临时的中间产物（设计稿导出中间图），不纳入版本库
+assets/images/Frame_11_3097.png
+assets/images/Frame_11_3097_filled.png
+assets/images/Frame_11_3097_bg_nocards.png
+assets/images/Frame_11_3097_placeholder_1x.png
+
+# 系统/编辑器
+.DS_Store
+Thumbs.db
+*.log
+.workbuddy/
+
+# 临时调试/校验产物（下划线开头）
+_*.png
+_*.jpg
+_*.json
+_*.py
+
