@@ -32,8 +32,8 @@
 	font-weight: 400;
 	src: url(assets/fonts/HarmonyOS_Sans_Regular_1.ttf) format('truetype');
 }
+body.pre-init { visibility: hidden; } /* fit() 执行前隐藏 body，跳过浏览器按 CSS 默认全尺寸(1920×4386)进行的首次 paint；fit() 同步执行完后再解除，避免"打开跳一下" */
 </style>
-  <script src="js/animation.js"></script>
   <style>
 
 * {
@@ -1138,7 +1138,7 @@ span {
 
   </style>
 </head>
-<body>
+<body class="pre-init">
 <div class="site-viewport">
 <div class="site-sizer">
 <div class="scroll-container">
@@ -1333,6 +1333,8 @@ span {
   }
   window.addEventListener('resize', fit);
   fit();
+  // 防"打开跳一下"：fit() 同步执行后立即解除 pre-init，让首次可见 paint 已是缩放后状态
+  document.body.classList.remove('pre-init');
 
   // 滚动揭示：元素进入视口(或已滚到页面底部)时加上 .in 显形
   var reveals = Array.prototype.slice.call(document.querySelectorAll('.reveal, .reveal-fade'));
