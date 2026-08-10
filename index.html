@@ -80,6 +80,7 @@ body {
   width: 100%;
   height: 100%;
   overflow: auto;
+  overflow-x: hidden; /* 杜绝竖向滚动条挤占宽度后产生的横向滚动条(底部横条) */
   position: relative;
 }
 
@@ -1318,8 +1319,12 @@ span {
   var BASE_H = 4386;
   var sizer = document.querySelector('.site-sizer');
   var scroller = document.querySelector('.scroll-container');
+  var vp = document.querySelector('.site-viewport');
+
   function fit() {
-    var w = window.innerWidth;
+    // 用视口「内容宽度」(clientWidth 已排除垂直滚动条) 计算缩放，
+    // 避免竖向滚动条挤占宽度后产生横向溢出 → 底部出现横向滚动条(横条)。
+    var w = (vp && vp.clientWidth) || window.innerWidth;
     var scale = Math.min(w / BASE_W, 1);
     // 直接通过内联样式设置 transform，确保浏览器一定应用（不依赖 CSS 变量解析）
     scroller.style.transform = 'scale(' + scale.toFixed(4) + ')';
@@ -1329,8 +1334,7 @@ span {
   window.addEventListener('resize', fit);
   fit();
 
-  // 滚动揭示：进入视口时加上 .in
-  var vp = document.querySelector('.site-viewport');
+  // 滚动揭示：元素进入视口(或已滚到页面底部)时加上 .in 显形
   var reveals = Array.prototype.slice.call(document.querySelectorAll('.reveal, .reveal-fade'));
 
   // 页脚模块错落延迟（按在页脚容器内的先后顺序）
@@ -1344,14 +1348,21 @@ span {
 
   var ticking = false;
   function revealCheck() {
+    if (!vp) return;
     var h = vp.clientHeight || window.innerHeight;
+    // 已滚到(或接近)底部：强制揭示剩余元素，兜底防止底部钉死的元素永远不触发
+    var atBottom = (vp.scrollTop + vp.clientHeight) >= (vp.scrollHeight - 6);
     var pending = 0;
     for (var i = 0; i < reveals.length; i++) {
       var el = reveals[i];
       if (el.classList.contains('in')) continue;
       var r = el.getBoundingClientRect();
-      if (r.top < h * 0.86 && r.bottom > 0) el.classList.add('in');
-      else pending++;
+      // 条件：已到底部(兜底)；或元素有任何一部分进入视口(顶部低于视口下沿且底部高于视口上沿)
+      if (atBottom || (r.top < h + 40 && r.bottom > 0)) {
+        el.classList.add('in');
+      } else {
+        pending++;
+      }
     }
     // 全部揭示后卸载滚动监听，避免长期占用滚动帧
     if (pending === 0) vp.removeEventListener('scroll', onScroll);
@@ -1363,14 +1374,12 @@ span {
       requestAnimationFrame(revealCheck);
     }
   }
-  vp.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', function () {
+  if (vp) {
+    vp.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', revealCheck);
+    window.addEventListener('load', revealCheck); // 图片/字体加载完再校正一次位置
     revealCheck();
-    // resize 后若仍有未揭示元素，重新挂上滚动监听
-    var stillPending = reveals.some(function (e) { return !e.classList.contains('in'); });
-    if (stillPending) vp.addEventListener('scroll', onScroll, { passive: true });
-  });
-  revealCheck();
+  }
 })();
 </script>
 
