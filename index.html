@@ -1108,6 +1108,9 @@ span {
     .reveal-fade.in { opacity: 1; }
   }
 
+  /* 视差层：仅做平移，提示浏览器单独合成，避免与滚动重绘耦合 */
+  [data-speed] { will-change: translate; }
+
   /* 悬停微交互：导航链接 */
   .Pixso-paragraph-1232_2010,
   .Pixso-paragraph-1232_2011,
@@ -1146,15 +1149,15 @@ span {
     <div id="1232_1993" class="Pixso-frame-1232_1993">
       <div id="1232_1996" class="Pixso-frame-1232_1996">
         <div id="1232_1997" class="Pixso-frame-1232_1997">
-          <div id="1232_1998" class="Pixso-rectangle-1232_1998"></div>
+          <div id="1232_1998" class="Pixso-rectangle-1232_1998" data-speed="0.15"></div>
           <div id="1232_1999" class="Pixso-rectangle-1232_1999"></div>
         </div>
         <div id="1232_2000" class="Pixso-group-1232_2000">
           <div id="1298_2794" class="Pixso-frame-1298_2794">
             <div class="frame-content-1298_2794">
               <div id="1232_2001" class="Pixso-frame-1232_2001">
-                <div id="1232_2002" class="Pixso-vector-1232_2002"></div>
-                <div id="1232_2003" class="Pixso-vector-1232_2003"></div>
+                <div id="1232_2002" class="Pixso-vector-1232_2002" data-speed="-0.08"></div>
+                <div id="1232_2003" class="Pixso-vector-1232_2003" data-speed="-0.08"></div>
               </div>
               <div id="1232_2009" class="Pixso-frame-1232_2009">
                 <p id="1232_2010" class="Pixso-paragraph-1232_2010">LIND PORTFOLIO (BLIND BOX)</p>
@@ -1179,7 +1182,7 @@ span {
             <p id="1232_2017" class="Pixso-paragraph-1232_2017">Creative Story &amp; Collection</p>
             <p id="1232_2018" class="Pixso-paragraph-1232_2018">This is where art, AI, and antiquity converge.</p>
             <p id="1232_2019" class="Pixso-paragraph-1232_2019">DESIGNE</p>
-            <div id="1232_2020" class="Pixso-vector-1232_2020"></div>
+            <div id="1232_2020" class="Pixso-vector-1232_2020" data-speed="0.08"></div>
           </div>
           <div id="1232_2025" class="Pixso-group-1232_2025">
             <div id="1232_2026" class="Pixso-rectangle-1232_2026" style="cursor: pointer;"></div>
@@ -1192,7 +1195,7 @@ span {
           <div id="1232_2033" class="Pixso-frame-1232_2033">
             <div class="frame-content-1232_2033">
               <div id="1232_2034" class="Pixso-rectangle-1232_2034"></div>
-              <div id="1232_2035" class="Pixso-vector-1232_2035"></div>
+              <div id="1232_2035" class="Pixso-vector-1232_2035" data-speed="-0.06"></div>
             </div>
           </div>
           <div id="11_3144" class="Pixso-frame-11_3144">
@@ -1219,7 +1222,7 @@ span {
               </div>
             </div>
           </div>
-          <div id="1232_2041" class="Pixso-rectangle-1232_2041"></div>
+          <div id="1232_2041" class="Pixso-rectangle-1232_2041" data-speed="0.05"></div>
         </div>
       </div>
       <div id="11_3097" class="Pixso-vector-11_3097 reveal-fade">
@@ -1234,8 +1237,8 @@ span {
         </div>
         <div id="5_1404" class="Pixso-vector-5_1404 reveal"></div>
         <div id="1358_3157" class="Pixso-frame-1358_3157">
-          <div id="1232_2064" class="Pixso-vector-1232_2064"></div>
-          <div id="11_3094" class="Pixso-vector-11_3094"></div>
+          <div id="1232_2064" class="Pixso-vector-1232_2064" data-speed="-0.10"></div>
+          <div id="11_3094" class="Pixso-vector-11_3094" data-speed="-0.10"></div>
         </div>
         <div id="1232_2067" class="Pixso-text-1232_2067 reveal">
           <p id="1232_2067_0" class="Pixso-paragraph-1232_2067_0">
@@ -1320,12 +1323,14 @@ span {
   var sizer = document.querySelector('.site-sizer');
   var scroller = document.querySelector('.scroll-container');
   var vp = document.querySelector('.site-viewport');
+  var currentScale = 1;
 
   function fit() {
     // 用视口「内容宽度」(clientWidth 已排除垂直滚动条) 计算缩放，
     // 避免竖向滚动条挤占宽度后产生横向溢出 → 底部出现横向滚动条(横条)。
     var w = (vp && vp.clientWidth) || window.innerWidth;
     var scale = Math.min(w / BASE_W, 1);
+    currentScale = scale;
     // 直接通过内联样式设置 transform，确保浏览器一定应用（不依赖 CSS 变量解析）
     scroller.style.transform = 'scale(' + scale.toFixed(4) + ')';
     sizer.style.width = (BASE_W * scale) + 'px';
@@ -1333,6 +1338,20 @@ span {
   }
   window.addEventListener('resize', fit);
   fit();
+
+  // 视差层：带 data-speed 的装饰元素（>0 像背景层滞后，<0 像前景层超前）
+  var pxEls = Array.prototype.slice.call(document.querySelectorAll('[data-speed]'));
+  function parallaxUpdate() {
+    if (!vp) return;
+    var st = vp.scrollTop;
+    for (var i = 0; i < pxEls.length; i++) {
+      var el = pxEls[i];
+      var speed = parseFloat(el.getAttribute('data-speed')) || 0;
+      // 屏幕位移 = st * speed；容器已 scale，故本地位移 = 屏幕位移 / scale
+      var local = (st * speed) / (currentScale || 1);
+      el.style.translate = '0 ' + local.toFixed(2) + 'px';
+    }
+  }
 
   // 滚动揭示：元素进入视口(或已滚到页面底部)时加上 .in 显形
   var reveals = Array.prototype.slice.call(document.querySelectorAll('.reveal, .reveal-fade'));
@@ -1347,8 +1366,9 @@ span {
   }
 
   var ticking = false;
+  var revealDone = false;
   function revealCheck() {
-    if (!vp) return;
+    if (revealDone || !vp) return;
     var h = vp.clientHeight || window.innerHeight;
     // 已滚到(或接近)底部：强制揭示剩余元素，兜底防止底部钉死的元素永远不触发
     var atBottom = (vp.scrollTop + vp.clientHeight) >= (vp.scrollHeight - 6);
@@ -1364,21 +1384,25 @@ span {
         pending++;
       }
     }
-    // 全部揭示后卸载滚动监听，避免长期占用滚动帧
-    if (pending === 0) vp.removeEventListener('scroll', onScroll);
+    if (pending === 0) revealDone = true; // 揭示完成后不再重复计算，但滚动仍驱动视差
+  }
+  function frame() {
+    revealCheck();
+    parallaxUpdate();
     ticking = false;
   }
   function onScroll() {
     if (!ticking) {
       ticking = true;
-      requestAnimationFrame(revealCheck);
+      requestAnimationFrame(frame);
     }
   }
   if (vp) {
     vp.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', revealCheck);
-    window.addEventListener('load', revealCheck); // 图片/字体加载完再校正一次位置
+    window.addEventListener('resize', function () { revealCheck(); parallaxUpdate(); });
+    window.addEventListener('load', function () { revealCheck(); parallaxUpdate(); });
     revealCheck();
+    parallaxUpdate();
   }
 })();
 </script>
