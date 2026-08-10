@@ -33,6 +33,9 @@
 	src: url(assets/fonts/HarmonyOS_Sans_Regular_1.ttf) format('truetype');
 }
 body.pre-init { visibility: hidden; } /* fit() 执行前隐藏 body，跳过浏览器按 CSS 默认全尺寸(1920×4386)进行的首次 paint；fit() 同步执行完后再解除，避免"打开跳一下" */
+/* 兜底：即使 JS 未执行/报错，0.12s 后也强制显形，避免整页永久 visibility:hidden 导致空白 */
+@keyframes __forceReveal { to { visibility: visible; } }
+body.pre-init { animation: __forceReveal 0.01s linear 0.12s forwards; }
 </style>
   <style>
 
@@ -1332,9 +1335,14 @@ span {
     sizer.style.height = (BASE_H * scale) + 'px';
   }
   window.addEventListener('resize', fit);
-  fit();
+  try {
+    fit();
+  } catch (e) {
+    // fit 出错也不要让页面永久隐藏
+    if (window.console) console.error('[fit]', e);
+  }
   // 防"打开跳一下"：fit() 同步执行后立即解除 pre-init，让首次可见 paint 已是缩放后状态
-  document.body.classList.remove('pre-init');
+  if (document.body) document.body.classList.remove('pre-init');
 
   // 滚动揭示：元素进入视口(或已滚到页面底部)时加上 .in 显形
   var reveals = Array.prototype.slice.call(document.querySelectorAll('.reveal, .reveal-fade'));
