@@ -1109,6 +1109,23 @@ span {
       transition: opacity 1.1s ease;
     }
     .reveal-fade.in { opacity: 1; }
+
+    /* 作品板块专属：向下擦除揭示 + 去模糊 + 淡入。
+       刻意只用 clip-path / filter / opacity，不动 transform，
+       以免覆盖 #11_3097 自身的居中定位 transform。 */
+    .reveal-works {
+      opacity: 0;
+      clip-path: inset(0 0 100% 0);
+      filter: blur(10px);
+      transition: opacity 1s ease,
+                  clip-path 1.15s cubic-bezier(.22, .61, .36, 1),
+                  filter 1s ease;
+    }
+    .reveal-works.in {
+      opacity: 1;
+      clip-path: inset(0 0 0% 0);
+      filter: blur(0);
+    }
   }
 
   /* 悬停微交互：导航链接 */
@@ -1225,7 +1242,7 @@ span {
           <div id="1232_2041" class="Pixso-rectangle-1232_2041"></div>
         </div>
       </div>
-      <div id="11_3097" class="Pixso-vector-11_3097 reveal-fade">
+      <div id="11_3097" class="Pixso-vector-11_3097 reveal-works">
       </div>
       <div id="1232_2051" class="Pixso-group-1232_2051">
         <div id="1232_2052" class="Pixso-vector-1232_2052 reveal"></div>
@@ -1318,6 +1335,14 @@ span {
 
 <script>
 (function () {
+  'use strict';
+
+  /* ============================================================
+   * MODULE: SCALING  —— 整页等比缩放（自适应响应式）
+   * 用途：把 1920×4386 设计稿按视口「内容宽度」整体 scale，
+   *       由 .site-sizer 撑出滚动高度。缩放直接写内联 transform，
+   *       确保必定生效（不依赖 CSS 变量解析）。
+   * ============================================================ */
   var BASE_W = 1920;
   var BASE_H = 4386;
   var sizer = document.querySelector('.site-sizer');
@@ -1330,22 +1355,24 @@ span {
     var w = (vp && vp.clientWidth) || window.innerWidth;
     var scale = Math.min(w / BASE_W, 1);
     // 直接通过内联样式设置 transform，确保浏览器一定应用（不依赖 CSS 变量解析）
-    scroller.style.transform = 'scale(' + scale.toFixed(4) + ')';
-    sizer.style.width = (BASE_W * scale) + 'px';
-    sizer.style.height = (BASE_H * scale) + 'px';
+    if (scroller) scroller.style.transform = 'scale(' + scale.toFixed(4) + ')';
+    if (sizer) {
+      sizer.style.width = (BASE_W * scale) + 'px';
+      sizer.style.height = (BASE_H * scale) + 'px';
+    }
   }
-  window.addEventListener('resize', fit);
-  try {
-    fit();
-  } catch (e) {
-    // fit 出错也不要让页面永久隐藏
-    if (window.console) console.error('[fit]', e);
-  }
-  // 防"打开跳一下"：fit() 同步执行后立即解除 pre-init，让首次可见 paint 已是缩放后状态
-  if (document.body) document.body.classList.remove('pre-init');
+  /* ===================== MODULE: SCALING END ===================== */
 
-  // 滚动揭示：元素进入视口(或已滚到页面底部)时加上 .in 显形
-  var reveals = Array.prototype.slice.call(document.querySelectorAll('.reveal, .reveal-fade'));
+
+  /* ============================================================
+   * MODULE: REVEAL  —— 通用滚动揭示引擎
+   * 用途：元素进入视口(或滚到页面底部)时加 .in 显形。
+   *       配套 CSS：.reveal(上移淡入) / .reveal-fade(纯淡入)。
+   *       页脚模块按内部顺序错落延迟出场。
+   * ============================================================ */
+  function collect(selector) {
+    return Array.prototype.slice.call(document.querySelectorAll(selector));
+  }
 
   // 页脚模块错落延迟（按在页脚容器内的先后顺序）
   var footer = document.getElementById('1232_2051');
@@ -1356,40 +1383,71 @@ span {
     }
   }
 
+  var revealEls = collect('.reveal, .reveal-fade');
+  /* ===================== MODULE: REVEAL END ===================== */
+
+
+  /* ============================================================
+   * MODULE: WORKS_ANIM  —— 作品板块专属动画
+   * 用途：作品板块(#11_3097)使用独立的 .reveal-works 类，触发
+   *       「向下擦除揭示 + 去模糊 + 淡入」效果（见 CSS）。
+   *       刻意只用 clip-path/filter/opacity，不动 transform，
+   *       以免覆盖该元素自身的居中定位 transform。
+   * ============================================================ */
+  var worksEls = collect('.reveal-works');
+  /* ===================== MODULE: WORKS_ANIM END ===================== */
+
+
+  /* ============================================================
+   * MODULE: BOOTSTRAP  —— 初始化与滚动/缩放驱动
+   * 用途：运行 fit()；注册 resize / scroll / load 监听；用单个
+   *       rAF 节流循环同时驱动所有 reveal 分组；最后解除 pre-init
+   *       隐藏（带 try/catch 兜底，绝不卡空白）。
+   * ============================================================ */
   var ticking = false;
-  function revealCheck() {
+  function onFrame() {
     if (!vp) return;
     var h = vp.clientHeight || window.innerHeight;
     // 已滚到(或接近)底部：强制揭示剩余元素，兜底防止底部钉死的元素永远不触发
     var atBottom = (vp.scrollTop + vp.clientHeight) >= (vp.scrollHeight - 6);
-    var pending = 0;
-    for (var i = 0; i < reveals.length; i++) {
-      var el = reveals[i];
-      if (el.classList.contains('in')) continue;
-      var r = el.getBoundingClientRect();
-      // 条件：已到底部(兜底)；或元素有任何一部分进入视口(顶部低于视口下沿且底部高于视口上沿)
-      if (atBottom || (r.top < h + 40 && r.bottom > 0)) {
-        el.classList.add('in');
-      } else {
-        pending++;
+    var groups = [revealEls, worksEls];
+    for (var g = 0; g < groups.length; g++) {
+      var els = groups[g];
+      for (var i = 0; i < els.length; i++) {
+        var el = els[i];
+        if (el.classList.contains('in')) continue;
+        var r = el.getBoundingClientRect();
+        // 条件：已到底部(兜底)；或元素有任何一部分进入视口
+        if (atBottom || (r.top < h + 40 && r.bottom > 0)) el.classList.add('in');
       }
     }
-    // 全部揭示后卸载滚动监听，避免长期占用滚动帧
-    if (pending === 0) vp.removeEventListener('scroll', onScroll);
     ticking = false;
   }
-  function onScroll() {
+  function requestFrame() {
     if (!ticking) {
       ticking = true;
-      requestAnimationFrame(revealCheck);
+      requestAnimationFrame(onFrame);
     }
   }
   if (vp) {
-    vp.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', revealCheck);
-    window.addEventListener('load', revealCheck); // 图片/字体加载完再校正一次位置
-    revealCheck();
+    vp.addEventListener('scroll', requestFrame, { passive: true });
+    window.addEventListener('load', requestFrame); // 图片/字体加载完再校正一次位置
   }
+  // 缩放与揭示共用 resize 事件
+  window.addEventListener('resize', function () {
+    fit();
+    requestFrame();
+  });
+
+  // 防"打开跳一下"：fit() 同步执行后立即解除 pre-init，让首次可见 paint 已是缩放后状态
+  try {
+    fit();
+  } catch (e) {
+    if (window.console) console.error('[fit]', e);
+  }
+  if (document.body) document.body.classList.remove('pre-init');
+  requestFrame(); // 初次即校一次：处理已在视口内的元素 / 滚到底兜底
+  /* ===================== MODULE: BOOTSTRAP END ===================== */
 })();
 </script>
 
