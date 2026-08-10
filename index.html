@@ -157,11 +157,23 @@ span {
   height: 1062px;
   left: 50%;
   top: 50%;
-  transform: translateX(calc(-50% + 0px)) translateY(calc(-50% + -9px));
+  transform: translateX(-50%) translateY(-9px);
   background-size: 100.0000% 141.2429%;
   background-position: 0.00px -210.00px;
   background-repeat: no-repeat;
   background-image: url("assets/images/eda28bc5007ac010a8849520f16335e2f1e77c33.png");
+  animation: heroZoom 16s ease-in-out infinite alternate;
+  will-change: transform;
+}
+/* 首屏底图缓慢推近（Ken Burns）：保留居中位移 + 在 1.00~1.05 间平滑往返；
+   父容器 .Pixso-frame-1232_1997 有 overflow:hidden，会自然裁掉放大边缘，
+   视觉上就是"画面在轻微呼吸"。 */
+@keyframes heroZoom {
+  from { transform: translateX(-50%) translateY(-9px) scale(1.00); }
+  to   { transform: translateX(-50%) translateY(-9px) scale(1.05); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .Pixso-rectangle-1232_1998 { animation: none; }
 }
 
 .Pixso-rectangle-1232_1999 {
