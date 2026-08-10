@@ -1110,21 +1110,38 @@ span {
     }
     .reveal-fade.in { opacity: 1; }
 
-    /* 作品板块专属：向下擦除揭示 + 去模糊 + 淡入。
-       刻意只用 clip-path / filter / opacity，不动 transform，
-       以免覆盖 #11_3097 自身的居中定位 transform。 */
-    .reveal-works {
-      opacity: 0;
-      clip-path: inset(0 0 100% 0);
-      filter: blur(10px);
-      transition: opacity 1s ease,
-                  clip-path 1.15s cubic-bezier(.22, .61, .36, 1),
-                  filter 1s ease;
+    /* 作品板块：图片打碎重组动画 --------------------------------------------------
+       将 #11_3097 内部按 5×4=20 块 cell 网格化，每块是整张图的 1/20 局部；
+       触发前每块从随机偏移位置（translate + scale + rotate + opacity:0）出发，
+       进入视口后按对角线波次 (col+row)*45ms 错落飞回原位——重组拼成完整图。
+       故意只用 transform/opacity，不动 clip-path/filter，
+       避免覆盖 #11_3097 自身的居中 transform。 */
+    .works-shatter {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+      overflow: hidden;
+      pointer-events: none; /* 触发前不挡其它交互（cells 透明也无意义） */
     }
-    .reveal-works.in {
+    .works-shatter.in { pointer-events: auto; } /* 触发后恢复交互 */
+    .works-cell {
+      background-image: url("assets/images/Frame_11_3097_filled_1x.png");
+      background-repeat: no-repeat;
+      background-size: 500% 400%; /* 5×4 放大：每块按 position 拾取对应格子 */
+      opacity: 0;
+      transform: translate(var(--tx, 0px), var(--ty, 0px))
+                 scale(var(--sc, 0.85))
+                 rotate(var(--rt, 0deg));
+      transition: transform 0.75s cubic-bezier(0.2, 0.85, 0.3, 1.12),
+                  opacity 0.5s ease;
+      will-change: transform, opacity;
+    }
+    .works-shatter.in .works-cell {
       opacity: 1;
-      clip-path: inset(0 0 0% 0);
-      filter: blur(0);
+      transform: none;
+      /* delay 由 JS 按对角线波次计算后通过 style.transitionDelay 写入 */
     }
   }
 
@@ -1242,7 +1259,7 @@ span {
           <div id="1232_2041" class="Pixso-rectangle-1232_2041"></div>
         </div>
       </div>
-      <div id="11_3097" class="Pixso-vector-11_3097 reveal-works">
+      <div id="11_3097" class="Pixso-vector-11_3097">
       </div>
       <div id="1232_2051" class="Pixso-group-1232_2051">
         <div id="1232_2052" class="Pixso-vector-1232_2052 reveal"></div>
@@ -1388,13 +1405,62 @@ span {
 
 
   /* ============================================================
-   * MODULE: WORKS_ANIM  —— 作品板块专属动画
-   * 用途：作品板块(#11_3097)使用独立的 .reveal-works 类，触发
-   *       「向下擦除揭示 + 去模糊 + 淡入」效果（见 CSS）。
-   *       刻意只用 clip-path/filter/opacity，不动 transform，
-   *       以免覆盖该元素自身的居中定位 transform。
+   * MODULE: WORKS_ANIM  —— 作品板块"打碎重组"动画
+   * 用途：
+   *   ① 在 #11_3097 内部注入 5×4=20 块 .works-cell 网格，每块显示
+   *      原图 1/20 的局部（同一张 background-image，按 background-position
+   *      拾取格子），把整张图"打碎"成可视的碎片矩阵。
+   *   ② 给每块随机起始 transform（translate / scale / rotate）和
+   *      opacity:0，对角线波次 transitionDelay（(col+row)*45ms），形成
+   *      "炸开 → 错落飞回原位" 的重组效果。
+   *   ③ 把外层容器挂入 reveal 分组，进入视口时给 .works-shatter
+   *      加 .in，触发所有 cell 同时复位；触发后 is-ready 恢复交互。
+   *   兜底：若 JS 未跑，#11_3097 外层 background-image 仍显示静态原图
+   *   （cells 在 .in 前 opacity:0，用户看到的是 .Pixso-vector-11_3097
+   *   的背景图，等同无动画的原始视觉）。
    * ============================================================ */
-  var worksEls = collect('.reveal-works');
+  var worksBox = null;
+  try {
+    var host = document.getElementById('11_3097');
+    if (host) {
+      var grid = document.createElement('div');
+      grid.className = 'works-shatter';
+      var COLS = 5, ROWS = 4;
+      // 控制"打碎"的扩散力度（像素），可调大小影响炸开幅度
+      var SPREAD_X = 90, SPREAD_Y = 70;
+      for (var r = 0; r < ROWS; r++) {
+        for (var c = 0; c < COLS; c++) {
+          var cell = document.createElement('div');
+          cell.className = 'works-cell';
+          // 每块拾取格子：background-size 500%×400% 放大后
+          // background-position-x: c/(COLS-1)*100%，y 同理
+          var px = (c / (COLS - 1)) * 100;
+          var py = (r / (ROWS - 1)) * 100;
+          cell.style.backgroundPosition = px + '% ' + py + '%';
+          // 随机起始偏移：方向偏"向外飞"，位移随网格位置微调
+          // 中心格子少飞（爆炸中心），边缘格子多飞
+          var edgeFactor = 0.45 + 0.55 * (Math.abs(c - (COLS - 1) / 2) + Math.abs(r - (ROWS - 1) / 2)) / ((COLS - 1) + (ROWS - 1)) * 2;
+          var tx = (Math.random() - 0.5) * 2 * SPREAD_X * edgeFactor;
+          var ty = (Math.random() - 0.5) * 2 * SPREAD_Y * edgeFactor;
+          var sc = 0.55 + Math.random() * 0.25;       // 起始 0.55~0.80
+          var rt = (Math.random() - 0.5) * 30;        // ±15°
+          cell.style.setProperty('--tx', tx.toFixed(1) + 'px');
+          cell.style.setProperty('--ty', ty.toFixed(1) + 'px');
+          cell.style.setProperty('--sc', sc.toFixed(2));
+          cell.style.setProperty('--rt', rt.toFixed(1) + 'deg');
+          // 对角线波次 (col+row)*45ms，最大延迟 ≈ (4+3)*45 = 315ms
+          cell.style.transitionDelay = ((c + r) * 45) + 'ms';
+          grid.appendChild(cell);
+        }
+      }
+      host.appendChild(grid);
+      worksBox = grid;
+    }
+  } catch (e) {
+    if (window.console) console.error('[WORKS_ANIM] init failed:', e);
+    // 失败时让 #11_3097 自身保留静态背景图兜底（无动画也可看）
+  }
+  var worksEls = worksBox ? [worksBox] : [];
   /* ===================== MODULE: WORKS_ANIM END ===================== */
 
 
