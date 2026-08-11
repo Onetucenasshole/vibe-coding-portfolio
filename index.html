@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pixso HTML</title>
+  <title>LIND Portfolio</title>
   <style>
 @font-face {
 	font-family: 'HarmonyOS Sans SC';
@@ -25,8 +25,36 @@
 	font-weight: 400;
 	src: url("assets/fonts/HarmonyOS_Sans_Regular_1.ttf") format('truetype');
 }
+
+  /* === adaptive scaling wrapper === */
+  .site-viewport {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    overflow-x: hidden;
+    position: relative;
+  }
+  .site-sizer {
+    margin: 0 auto;
+    position: relative;
+    width: 100%;
+    max-width: 1920px;
+    height: 4386px;
+  }
+  .scroll-container {
+    width: 1920px;
+    height: 4386px;
+    transform-origin: 0 0;
+    transform: scale(1);
+    position: absolute;
+    top: 0;
+    left: 0;
+    will-change: transform;
+  }
+  .scroll-container > div { width: 100%; }
+
 </style>
-  <style>
+    <style>
 
 * {
   box-sizing: border-box;
@@ -43,7 +71,7 @@ ol li::marker, ul li::before {
   letter-spacing: 0;
 }
 
-.scroll-container > div {
+.pixso-inner > div {
   width: 100%;
 }
 
@@ -64,8 +92,7 @@ body {
   width: 100%;
   height: 100%;
   margin: 0;
-  background-color: #000000;
-  overflow: hidden;
+  background-color: white;
 }
     
 span {
@@ -77,32 +104,11 @@ span {
   height: 100%;
 }
 
-  .site-viewport {
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    overflow-x: hidden;
-    position: relative;
-  }
-
-  .site-sizer {
-    margin: 0 auto;
-    position: relative;
-    width: 100%;
-    max-width: 1920px;
-    height: 3340px;
-  }
-
-  .scroll-container {
-    width: 1920px;
-    height: 3340px;
-    transform-origin: 0 0;
-    transform: scale(1);
-    position: absolute;
-    top: 0;
-    left: 0;
-    will-change: transform;
-  }
+.pixso-inner {
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+}
 
 .Pixso-canvas-0_1,.Pixso-frame-1232_1993 {
   width: 100%;
@@ -115,11 +121,33 @@ span {
 }
 
 .Pixso-frame-1232_1993 {
-  height: 3340px;
+  height: 4386px;
   min-width: 1920px;
   overflow: hidden;
   background-color: rgba(0, 0, 0, 1);
   mix-blend-mode: normal;
+}
+
+.Pixso-frame-1232_1996,.Pixso-rectangle-25_23 {
+  width: 1920px;
+  height: 1080px;
+  position: absolute;
+  mix-blend-mode: normal;
+}
+
+.Pixso-frame-1232_1996 {
+  left: 50%;
+  top: 50%;
+  transform: translateX(calc(-50% + 0px)) translateY(calc(-50% + -1652px));
+}
+
+.Pixso-rectangle-25_23 {
+  left: 0px;
+  top: 0px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url("assets/images/3b76498d83ac75846a35133c425760249cd2c34a.png");
 }
 
 .Pixso-frame-1298_2794,.frame-content-1298_2794,.Pixso-frame-1232_2001 {
@@ -210,6 +238,60 @@ span {
   color: rgba(255, 255, 255, 1);
 }
 
+.Pixso-group-1232_2025,.Pixso-rectangle-1232_2026,.Pixso-rectangle-1232_2027,.Pixso-rectangle-1232_2028,.Pixso-rectangle-1232_2029,.Pixso-rectangle-1232_2030,.Pixso-rectangle-1232_2031 {
+  position: absolute;
+  mix-blend-mode: normal;
+}
+
+.Pixso-group-1232_2025 {
+  width: 1888px;
+  height: 469px;
+  left: 32px;
+  top: 412px;
+}
+
+.Pixso-rectangle-1232_2026,.Pixso-rectangle-1232_2027,.Pixso-rectangle-1232_2028,.Pixso-rectangle-1232_2029,.Pixso-rectangle-1232_2030 {
+  top: 102px;
+  background-color: rgba(193.70192, 193.70192, 193.70192, 1);
+}
+
+.Pixso-rectangle-1232_2026 {
+  width: 288px;
+  height: 367px;
+  left: 1044px;
+}
+
+.Pixso-rectangle-1232_2027 {
+  width: 288px;
+  height: 186px;
+  left: 1356px;
+}
+
+.Pixso-rectangle-1232_2028 {
+  width: 220px;
+  height: 186px;
+  left: 1668px;
+}
+
+.Pixso-rectangle-1232_2029 {
+  width: 288px;
+  height: 186px;
+  left: 732px;
+}
+
+.Pixso-rectangle-1232_2030 {
+  width: 288px;
+  height: 186px;
+  left: 0px;
+}
+
+.Pixso-rectangle-1232_2031 {
+  width: 288px;
+  height: 288px;
+  left: 316px;
+  top: 0px;
+  background-color: rgba(193.70192, 193.70192, 193.70192, 1);
+}
 
 .Pixso-vector-11_3097,.Pixso-frame-25_44,.Pixso-group-1232_2051 {
   position: absolute;
@@ -222,8 +304,8 @@ span {
   background-image: url("assets/images/Frame_11_3097.png");
   background-size: 100% 100%;
   background-repeat: no-repeat;
-  top: 100px;
-  transform: translateX(calc(-50% + 0px));
+  top: 50%;
+  transform: translateX(calc(-50% + 0px)) translateY(calc(-50% + 46.5px));
   display: flex;
   gap: 10px;
   align-items: center;
@@ -237,7 +319,7 @@ span {
 
 .Pixso-frame-25_44 {
   width: 1440px;
-  top: 2463px;
+  top: 3518px;
   mix-blend-mode: normal;
 }
 
@@ -768,16 +850,47 @@ span {
 }
 
 
-  </style>
+  
+  /* === adaptive scaling wrapper === */
+  .site-viewport {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    overflow-x: hidden;
+    position: relative;
+  }
+  .site-sizer {
+    margin: 0 auto;
+    position: relative;
+    width: 100%;
+    max-width: 1920px;
+    height: 4386px;
+  }
+  .scroll-container {
+    width: 1920px;
+    height: 4386px;
+    transform-origin: 0 0;
+    transform: scale(1);
+    position: absolute;
+    top: 0;
+    left: 0;
+    will-change: transform;
+  }
+  .scroll-container > div { width: 100%; }
 
+</style>
 </head>
 <body>
 <div class="site-viewport">
   <div class="site-sizer">
     <div class="scroll-container">
-      <div id="0_1" class="Pixso-canvas-0_1">
+
+<div class="pixso-inner">
+  <div id="0_1" class="Pixso-canvas-0_1">
     <div id="1232_1993" class="Pixso-frame-1232_1993">
-      <div id="1298_2794" class="Pixso-frame-1298_2794">
+      <div id="1232_1996" class="Pixso-frame-1232_1996">
+        <div id="25_23" class="Pixso-rectangle-25_23"></div>
+        <div id="1298_2794" class="Pixso-frame-1298_2794">
           <div class="frame-content-1298_2794">
             <div id="1232_2001" class="Pixso-frame-1232_2001">
               <div id="1232_2002" class="Pixso-vector-1232_2002"></div>
@@ -790,6 +903,15 @@ span {
             </div>
           </div>
         </div>
+        <div id="1232_2025" class="Pixso-group-1232_2025">
+          <div id="1232_2026" class="Pixso-rectangle-1232_2026" style="cursor: pointer;"></div>
+          <div id="1232_2027" class="Pixso-rectangle-1232_2027" style="cursor: pointer;"></div>
+          <div id="1232_2028" class="Pixso-rectangle-1232_2028"></div>
+          <div id="1232_2029" class="Pixso-rectangle-1232_2029"></div>
+          <div id="1232_2030" class="Pixso-rectangle-1232_2030"></div>
+          <div id="1232_2031" class="Pixso-rectangle-1232_2031"></div>
+        </div>
+      </div>
       <div id="11_3097" class="Pixso-vector-11_3097"></div>
       <div id="25_44" class="Pixso-frame-25_44">
         <div id="1232_2051" class="Pixso-group-1232_2051">
@@ -877,15 +999,21 @@ span {
     </div>
   </div>
 </div>
+
+
+<script>
+const $ = id => document.getElementById(id);
+
+CustomEase.create("LINEAR", "0,0,1,1");
+</script>
+
+
+    </div>
   </div>
 </div>
 <script>
 (function () {
-  /* ============================================================
-   * MODULE: SCALING  —— 整页等比缩放（自适应响应式）
-   * 把 1920x3340 页面（去掉首屏 hero 后）按视口内容宽度整体 scale，由 .site-sizer 撑出滚动高度。
-   * ============================================================ */
-  var BASE_W = 1920, BASE_H = 3340;
+  var BASE_W = 1920, BASE_H = 4386;
   var sizer = document.querySelector('.site-sizer');
   var scroller = document.querySelector('.scroll-container');
   var vp = document.querySelector('.site-viewport');
@@ -893,20 +1021,11 @@ span {
     var w = (vp && vp.clientWidth) || window.innerWidth;
     var scale = Math.min(w / BASE_W, 1);
     if (scroller) scroller.style.transform = 'scale(' + scale.toFixed(4) + ')';
-    if (sizer) {
-      sizer.style.height = (BASE_H * scale) + 'px';
-    }
+    if (sizer) sizer.style.height = (BASE_H * scale) + 'px';
   }
-  /* ===================== MODULE: SCALING END ===================== */
-
-  /* ============================================================
-   * MODULE: BOOTSTRAP  —— 初始化缩放
-   * ============================================================ */
-  try { fit(); } catch (e) { if (window.console) console.error('[fit]', e); }
   window.addEventListener('resize', function () { fit(); });
-  /* ===================== MODULE: BOOTSTRAP END ===================== */
+  try { fit(); } catch (e) { if (window.console) console.error('[fit]', e); }
 })();
 </script>
-
 </body>
 </html>
