@@ -88,7 +88,8 @@ span {
   .site-sizer {
     margin: 0 auto;
     position: relative;
-    width: 1920px;
+    width: 100%;
+    max-width: 1920px;
     height: 3340px;
   }
 
@@ -915,7 +916,6 @@ span {
     var scale = Math.min(w / BASE_W, 1);
     if (scroller) scroller.style.transform = 'scale(' + scale.toFixed(4) + ')';
     if (sizer) {
-      sizer.style.width = (BASE_W * scale) + 'px';
       sizer.style.height = (BASE_H * scale) + 'px';
     }
   }
