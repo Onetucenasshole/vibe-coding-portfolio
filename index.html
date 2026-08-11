@@ -26,34 +26,6 @@
 	src: url("assets/fonts/HarmonyOS_Sans_Regular_1.ttf") format('truetype');
 }
 
-  /* === adaptive scaling wrapper === */
-  .site-viewport {
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    overflow-x: hidden;
-    position: relative;
-  }
-  .site-sizer {
-    margin: 0 auto;
-    position: relative;
-    width: 100%;
-    max-width: 1920px;
-    height: 4386px;
-  }
-  .scroll-container {
-    width: 1920px;
-    height: 4386px;
-    transform-origin: 0 0;
-    transform: scale(1);
-    position: absolute;
-    top: 0;
-    left: 0;
-    will-change: transform;
-  }
-  .scroll-container > div { width: 100%; }
-
-</style>
     <style>
 
 * {
@@ -876,7 +848,15 @@ span {
     left: 0;
     will-change: transform;
   }
-  .scroll-container > div { width: 100%; }
+  .scroll-container > div { width: 100%; }  .scroll-container > div { width: 100%; }
+
+  .site-viewport {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    overflow-x: hidden;
+    position: relative;
+  }
 
 </style>
 </head>
