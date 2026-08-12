@@ -819,12 +819,20 @@ span {
 
   
   /* === works section figures (extracted from inline styles) === */
-  .works-figure { position: absolute; transform: translateZ(0); will-change: transform, box-shadow; }
+  .works-figure { position: absolute; transform: translateZ(0); will-change: transform, filter; }
+  /* 类似箭头装饰图标（works_icon_1/2 + 5_1404 Group SVG）点击反馈：按下时缩放 + 橙色发光（仅 :active，不加 :hover——用户不要悬停反馈） */
+  .works-figure.c-icon1, .works-figure.c-icon2, .Pixso-vector-5_1404 {
+    cursor: pointer;
+    transition: transform .15s cubic-bezier(.22,.61,.36,1), filter .15s ease;
+  }
+  .works-figure.c-icon1:active, .works-figure.c-icon2:active, .Pixso-vector-5_1404:active {
+    transform: scale(0.82);
+    filter: brightness(1.3) drop-shadow(0 0 14px rgba(234,158,98,.85)) drop-shadow(0 0 28px rgba(234,158,98,.55));
+  }
   /* 描边光效基础态（透明描边，由 GSAP 实时设色与宽度；预留 --card-color 变量） */
   .works-figure.c-m40, .works-figure.c-m20, .works-figure.c-0,
   .works-figure.c-p20, .works-figure.c-p40 {
-    box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent;
-    transition: box-shadow .25s ease-out;
+    transition: filter .25s ease-out;
   }
   .c-m40 { left:-46.5px; top:194.92px; width:434.5px; height:442.5px; }
   .c-m20 { left:174.5px; top:89.3px; width:397px; height:435px; }
@@ -911,12 +919,13 @@ span {
           </div>
         </nav>
         <div id="1232_2025" data-reveal class="Pixso-group-1232_2025" data-anim-load>
-          <div id="1232_2026" class="Pixso-rectangle-1232_2026" style="cursor: pointer;"></div>
-          <div id="1232_2027" class="Pixso-rectangle-1232_2027" style="cursor: pointer;"></div>
-          <div id="1232_2028" class="Pixso-rectangle-1232_2028"></div>
-          <div id="1232_2029" class="Pixso-rectangle-1232_2029"></div>
-          <div id="1232_2030" class="Pixso-rectangle-1232_2030"></div>
-          <div id="1232_2031" class="Pixso-rectangle-1232_2031"></div>
+          <!-- 6 个装饰矩形按视觉 left 升序延迟（2030→2031→2029→2026→2027→2028），从左到右依次显现 -->
+          <div id="1232_2030" data-reveal data-reveal-delay="0s"   class="Pixso-rectangle-1232_2030" style="cursor: pointer;"></div>
+          <div id="1232_2031" data-reveal data-reveal-delay="0.1s" class="Pixso-rectangle-1232_2031" style="cursor: pointer;"></div>
+          <div id="1232_2029" data-reveal data-reveal-delay="0.2s" class="Pixso-rectangle-1232_2029" style="cursor: pointer;"></div>
+          <div id="1232_2026" data-reveal data-reveal-delay="0.3s" class="Pixso-rectangle-1232_2026" style="cursor: pointer;"></div>
+          <div id="1232_2027" data-reveal data-reveal-delay="0.4s" class="Pixso-rectangle-1232_2027" style="cursor: pointer;"></div>
+          <div id="1232_2028" data-reveal data-reveal-delay="0.5s" class="Pixso-rectangle-1232_2028"></div>
         </div>
       </div>
       <div id="11_3097" class="Pixso-vector-11_3097">
@@ -1149,10 +1158,13 @@ span {
 
   function lightShadow(c, on) {
     if (!c) return;
+    // 描边光效：filter:drop-shadow 沿 PNG alpha 形状发光（box-shadow 在透明像素区不可见，
+    // 5 张扇形卡都是带 alpha 的 PNG，圆角/异形边缘的发光只能靠 drop-shadow 渲染）
+    // 组合：12px 紧贴外缘 + 30px 强外发 + 50px 弱扩散，对应卡片填充图片主色
     if (on) {
-      c.style.boxShadow = '0 0 0 2px ' + c._color + ', 0 0 30px ' + c._color + ', 0 0 60px ' + c._color + '55';
+      c.style.filter = 'drop-shadow(0 0 12px ' + c._color + ') drop-shadow(0 0 30px ' + c._color + ') drop-shadow(0 0 50px ' + c._color + 'aa) brightness(1.10)';
     } else {
-      c.style.boxShadow = '0 0 0 0 transparent, 0 0 0 0 transparent';
+      c.style.filter = '';
     }
   }
 
@@ -1211,7 +1223,7 @@ span {
         if (el && cards.indexOf(el) !== -1 && el._alphaAt(e.clientX, e.clientY) > 40) { hit = el; break; }
       }
       if (hit !== activeCard) {
-        if (activeCard) { activeCard.style.transform = ''; activeCard.style.boxShadow = ''; activeCard.style.zIndex = ''; }
+        if (activeCard) { activeCard.style.transform = ''; activeCard.style.filter = ''; activeCard.style.zIndex = ''; }
         activeCard = hit;
       }
       if (hit) {
@@ -1221,13 +1233,13 @@ span {
         var rx = ((e.clientY - cy) / (rect.height / 2)) * -10;
         var ry = ((e.clientX - cx) / (rect.width / 2)) * 12;
         hit.style.transform = 'perspective(800px) rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg) scale(1.04)';
-        hit.style.boxShadow = '0 0 0 2px ' + hit._color + ', 0 0 30px ' + hit._color + ', 0 0 60px ' + hit._color + '55';
+        hit.style.filter = 'drop-shadow(0 0 12px ' + hit._color + ') drop-shadow(0 0 30px ' + hit._color + ') drop-shadow(0 0 50px ' + hit._color + 'aa) brightness(1.10)';
         hit.style.zIndex = '40';
       }
     }
     worksArea.addEventListener('mousemove', function (e) { wev = e; if (!wraf) wraf = requestAnimationFrame(processWorkMove); });
     worksArea.addEventListener('mouseleave', function () {
-      cards.forEach(function (el) { el.style.transform = ''; el.style.boxShadow = ''; el.style.zIndex = ''; });
+      cards.forEach(function (el) { el.style.transform = ''; el.style.filter = ''; el.style.zIndex = ''; });
       activeCard = null;
     });
   }
