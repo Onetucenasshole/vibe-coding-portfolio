@@ -107,6 +107,7 @@ span {
 .Pixso-frame-1232_1996 {
   left: 50%;
   top: 50%;
+  overflow: hidden;
   transform: translateX(calc(-50% + 0px)) translateY(calc(-50% + -1652px));
 }
 
@@ -1000,86 +1001,111 @@ span {
 <script src="js/ScrollTrigger.min.js"></script>
 <script>
 (function () {
-  if (!window.gsap || !window.ScrollTrigger) return; // graceful: hero revealed by CSS fallback
-  gsap.registerPlugin(ScrollTrigger);
-  ScrollTrigger.config({ ignoreMobileResize: true });
-
-  // Real scroller is the window (the scaled .scroll-container only renders; .site-sizer defines the scroll range).
-  var mm = gsap.matchMedia();
-
-  // Reduced motion: no entrance animation, just reveal the hero guard.
-  mm.add("(prefers-reduced-motion: reduce)", function () {
-    document.body.classList.remove("gsap-pending");
-  });
-
-  // Normal: full animation set. Resting state always equals the Pixso design.
-  mm.add("(prefers-reduced-motion: no-preference)", function () {
-    document.body.classList.remove("gsap-pending");
-
-    // --- Hero / nav on-load entrance (above the fold) ---
-    var heroTl = gsap.timeline({ defaults: { ease: "power3.out" } });
-    heroTl
-      .from("#25_23", { autoAlpha: 0, duration: 0.9 }, 0)
-      .from("#1298_2794", { y: -40, autoAlpha: 0, duration: 0.7 }, 0.1)
-      .from("#1232_2025 > *", { y: 16, autoAlpha: 0, duration: 0.5, stagger: 0.05 }, 0.25);
-
-    // --- Works section: CARD ENTRANCE is the priority ---
-    var cards = ".c-m40, .c-m20, .c-0, .c-p20, .c-p40";
-    var worksTl = gsap.timeline({
-      defaults: { ease: "power3.out" },
-      scrollTrigger: { trigger: "#25_32", start: "top 78%", once: true }
-    });
-    worksTl
-      .from(cards, { y: 64, autoAlpha: 0, scale: 0.92, duration: 0.7, stagger: 0.09 }, 0)
-      .from([".c-circle", ".c-icon1", ".c-icon2", ".c-logo"], { y: 40, autoAlpha: 0, duration: 0.6, stagger: 0.07, ease: "power2.out" }, 0.15)
-      .from(".c-portrait", { y: 50, autoAlpha: 0, duration: 0.9, ease: "power2.out" }, 0.1)
-      .from(".c-linde", { y: 24, autoAlpha: 0, duration: 0.6, ease: "power2.out" }, 0.4);
-
-    // --- Footer reveal on scroll ---
-    gsap.from("#25_44 .Pixso-group-1232_2051 > *", {
-      y: 30, autoAlpha: 0, duration: 0.6, stagger: 0.05, ease: "power2.out",
-      scrollTrigger: { trigger: "#25_44", start: "top 85%", once: true }
-    });
-
-    // --- Card hover (resting state = design; rotation/shadow are baked into the PNG) ---
-    gsap.utils.toArray(cards).forEach(function (card) {
-      card.addEventListener("mouseenter", function () {
-        gsap.to(card, { scale: 1.04, filter: "brightness(1.06)", duration: 0.4, ease: "power2.out", overwrite: "auto" });
-      });
-      card.addEventListener("mouseleave", function () {
-        gsap.to(card, { scale: 1, filter: "brightness(1)", duration: 0.5, ease: "power2.out", overwrite: "auto" });
-      });
-    });
-
-    // Cleanup if the user toggles the OS reduced-motion setting at runtime.
-    return function () {
-      gsap.set(
-        [cards, ".c-circle", ".c-icon1", ".c-icon2", ".c-logo", ".c-portrait", ".c-linde",
-         "#25_44 .Pixso-group-1232_2051 > *", "#25_23", "#1298_2794", "#1232_2025 > *"],
-        { clearProps: "all" }
-      );
-    };
-  });
-
-  // Recompute trigger positions after the scaled layout settles / on resize.
-  window.addEventListener("load", function () { ScrollTrigger.refresh(); });
-})();
-</script>
-<script>
-(function () {
   var BASE_W = 1920, BASE_H = 4386;
   var sizer = document.querySelector('.site-sizer');
   var scroller = document.querySelector('.scroll-container');
   var vp = document.querySelector('.site-viewport');
+
   function fit() {
     var w = (vp && vp.clientWidth) || window.innerWidth;
     var scale = Math.min(w / BASE_W, 1);
     if (scroller) scroller.style.transform = 'scale(' + scale.toFixed(4) + ')';
     if (sizer) sizer.style.height = (BASE_H * scale) + 'px';
-    if (window.ScrollTrigger) { try { ScrollTrigger.refresh(); } catch (e) {} }
+    return scale;
   }
-  window.addEventListener('resize', function () { fit(); });
-  try { fit(); } catch (e) { if (window.console) console.error('[fit]', e); }
+  fit();
+
+  function start() {
+    if (!window.gsap || !window.ScrollTrigger) { document.body.classList.remove('gsap-pending'); return; }
+    try {
+      gsap.registerPlugin(ScrollTrigger);
+      ScrollTrigger.config({ ignoreMobileResize: true });
+      document.body.classList.remove('gsap-pending');
+
+      var mm = gsap.matchMedia();
+      mm.add("(prefers-reduced-motion: reduce)", function () {
+        document.body.classList.remove('gsap-pending');
+      });
+      mm.add("(prefers-reduced-motion: no-preference)", function () {
+        document.body.classList.remove('gsap-pending');
+
+        // HERO on-load entrance (slide + fade)
+        gsap.timeline({ defaults: { ease: "power3.out" } })
+          .from("#25_23", { autoAlpha: 0, duration: 1.0 }, 0)
+          .from("#1298_2794", { y: -48, autoAlpha: 0, duration: 0.8 }, 0.15)
+          .from("#1232_2025 > *", { y: 18, autoAlpha: 0, duration: 0.55, stagger: 0.06 }, 0.3);
+
+        // HERO background slow zoom (放大缩小) - always on, clipped by hero frame
+        gsap.to("#25_23", { scale: 1.06, duration: 9, ease: "sine.inOut", yoyo: true, repeat: -1, delay: 1.0 });
+
+        // WORKS on-load entrance (priority: slide + zoom) - guaranteed visible regardless of scroll position
+        var cards = ".c-m40, .c-m20, .c-0, .c-p20, .c-p40";
+        gsap.timeline({ defaults: { ease: "power3.out" }, delay: 0.45 })
+          .from(cards, { y: 90, autoAlpha: 0, scale: 0.88, duration: 0.9, stagger: 0.1 }, 0)
+          .from([".c-circle", ".c-icon1", ".c-icon2", ".c-logo"], { y: 50, autoAlpha: 0, duration: 0.7, stagger: 0.08, ease: "power2.out" }, 0.2)
+          .from(".c-portrait", { y: 70, autoAlpha: 0, scale: 0.96, duration: 1.0, ease: "power2.out" }, 0.15)
+          .from(".c-linde", { y: 30, autoAlpha: 0, duration: 0.7, ease: "power2.out" }, 0.5);
+
+        // FOOTER reveal on scroll (genuinely below the fold at every scale)
+        gsap.from("#25_44 .Pixso-group-1232_2051 > *", {
+          y: 40, autoAlpha: 0, duration: 0.7, stagger: 0.06, ease: "power2.out",
+          scrollTrigger: { trigger: "#25_44", start: "top 85%", once: true }
+        });
+
+        // CARD HOVER zoom in/out (放大缩小, interactive; rotation/shadow baked in PNG)
+        gsap.utils.toArray(cards).forEach(function (card) {
+          card.addEventListener("mouseenter", function () {
+            gsap.to(card, { scale: 1.12, filter: "brightness(1.12)", duration: 0.45, ease: "power2.out", overwrite: "auto" });
+          });
+          card.addEventListener("mouseleave", function () {
+            gsap.to(card, { scale: 1, filter: "brightness(1)", duration: 0.55, ease: "power2.out", overwrite: "auto" });
+          });
+        });
+
+        // MOUSE-LINKED PARALLAX (鼠标联动)
+        var pEls = gsap.utils.toArray("#25_32 .works-figure, #1232_2025 > *");
+        var depth = pEls.map(function (el) {
+          var c = el.classList;
+          if (c.contains("c-portrait")) return 10;
+          if (c.contains("c-circle")) return 14;
+          if (c.contains("c-logo")) return 6;
+          if (c.contains("c-linde")) return 5;
+          if (c.contains("c-icon1") || c.contains("c-icon2")) return 18;
+          if (el.parentElement && el.parentElement.id === "1232_2025") return 16;
+          return 26;
+        });
+        var sx = pEls.map(function (el) { return gsap.quickTo(el, "x", { duration: 0.7, ease: "power3" }); });
+        var sy = pEls.map(function (el) { return gsap.quickTo(el, "y", { duration: 0.7, ease: "power3" }); });
+        var pOn = false;
+        gsap.delayedCall(1.4, function () { pOn = true; });
+        window.addEventListener("mousemove", function (e) {
+          if (!pOn) return;
+          var nx = (e.clientX / window.innerWidth - 0.5) * 2;
+          var ny = (e.clientY / window.innerHeight - 0.5) * 2;
+          for (var i = 0; i < pEls.length; i++) {
+            sx[i](-nx * depth[i]);
+            sy[i](-ny * depth[i]);
+          }
+        });
+
+        return function () {
+          gsap.set([cards, ".c-circle", ".c-icon1", ".c-icon2", ".c-logo", ".c-portrait", ".c-linde",
+            "#25_44 .Pixso-group-1232_2051 > *", "#25_23", "#1298_2794", "#1232_2025 > *"], { clearProps: "all" });
+        };
+      });
+
+      ScrollTrigger.refresh();
+    } catch (err) {
+      document.body.classList.remove('gsap-pending');
+      if (window.console) console.error('[anim]', err);
+    }
+  }
+
+  window.addEventListener("resize", function () { fit(); if (window.ScrollTrigger) ScrollTrigger.refresh(); });
+  window.addEventListener("load", function () { if (window.ScrollTrigger) ScrollTrigger.refresh(); });
+
+  if (window.gsap && window.ScrollTrigger) start();
+  else window.addEventListener("load", start);
 })();
 </script>
 </body>
