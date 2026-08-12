@@ -268,7 +268,11 @@ span {
 .Pixso-vector-11_3097 {
   width: 1920px;
   height: 2353px;
-  background: radial-gradient(ellipse 67% 55% at 50% 65%, rgba(0,0,0,0) 0%, rgba(0,0,0,0.95) 100%);
+  /* 背景图 = Pixso 容器 2 (11:3097) 的填充：收藏到_ART 作品图 @0.39 不透明 + 径向渐变暗角，已烘焙进 works-bg.png */
+  background-image: url("assets/images/works-bg.png");
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
   top: 1063px;
   transform: translateX(calc(-50% + 0px));
 }
@@ -846,16 +850,40 @@ span {
   /* === 滚动显现 / 悬停 / 视差（原生实现，零外部依赖） === */
   .js [data-reveal] {
     opacity: 0;
-    transform: translateY(48px);
-    transition: opacity .85s cubic-bezier(.22,.61,.36,1),
-                transform .85s cubic-bezier(.22,.61,.36,1),
-                scale .45s ease, filter .45s ease;
-    will-change: opacity, transform;
+    translate: 0 48px;
+    transition: opacity .6s cubic-bezier(.22,.61,.36,1),
+                translate .6s cubic-bezier(.22,.61,.36,1),
+                scale .4s ease, filter .35s ease;
+    will-change: opacity, translate;
   }
-  .js [data-reveal].is-visible { opacity: 1; transform: none; }
+  .js [data-reveal].is-visible { opacity: 1; translate: 0 0; }
 
-  /* 卡片悬停放大 + 提亮（放大缩小交互） */
-  .works-figure:hover { scale: 1.06; filter: brightness(1.12); }
+  /* 卡片：悬停跟随转动 + 对应颜色描边光效（transform / filter 由 JS 控制，避免相邻误触） */
+  .js [data-reveal].works-figure {
+    transition: transform .22s ease-out, scale .35s ease, filter .35s ease,
+                translate .55s cubic-bezier(.22,.61,.36,1), opacity .55s ease;
+  }
+
+  /* 作品区左右切换箭头（点击动效 + 切换聚焦卡片） */
+  .works-nav {
+    position: absolute;
+    top: 430px;
+    width: 58px; height: 58px;
+    margin: 0; padding: 0;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,.55);
+    background: rgba(18,18,18,.5);
+    color: #fff; font-size: 30px; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; z-index: 60;
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    transition: transform .16s ease, background .2s ease, box-shadow .25s ease, border-color .2s ease;
+    user-select: none; -webkit-user-select: none;
+  }
+  .works-nav.prev { left: 250px; }
+  .works-nav.next { right: 250px; }
+  .works-nav:hover { background: rgba(40,40,40,.62); box-shadow: 0 0 22px rgba(255,255,255,.22); border-color: rgba(255,255,255,.85); }
+  .works-nav:active { transform: scale(.82); }
 
   /* 首屏背景缓慢呼吸（Ken Burns） */
   #25_23 { transform-origin: center; animation: kbZoom 12s ease-in-out infinite alternate; }
@@ -905,7 +933,7 @@ span {
           <!-- 5 rotated cards (rotation + shadow baked from Pixso export) -->
           <img src="assets/images/card_m40.png" class="works-figure c-m40" data-reveal alt="card -40" />
           <img src="assets/images/card_m20.png" class="works-figure c-m20" data-reveal alt="card -20" />
-          <img src="assets/images/card_0.png" class="works-figure c-0" data-reveal alt="card 0" />
+          <img src="assets/images/card_0.png" class="works-figure c-0" data-reveal data-reveal-delay="0" alt="card 0" />
           <img src="assets/images/card_p20.png" class="works-figure c-p20" data-reveal alt="card +20" />
           <img src="assets/images/card_p40.png" class="works-figure c-p40" data-reveal alt="card +40" />
           <!-- circle group (stroke + image fill baked) -->
@@ -920,28 +948,30 @@ span {
           <!-- portrait (rounded corners + shadow baked from Pixso export) -->
           <img src="assets/images/works_portrait_v2.png" class="works-figure c-portrait" data-reveal alt="portrait" />
         </div>
+        <button class="works-nav prev" type="button" aria-label="上一张">&#10094;</button>
+        <button class="works-nav next" type="button" aria-label="下一张">&#10095;</button>
       </div>
       <footer id="25_44" class="Pixso-frame-25_44">
-        <div id="1232_2051" data-reveal class="Pixso-group-1232_2051">
+        <div id="1232_2051" class="Pixso-group-1232_2051">
           <div id="1232_2052" class="Pixso-vector-1232_2052"></div>
-          <p id="1232_2055" class="Pixso-paragraph-1232_2055">@2026  LIND · 林德创意化探索</p>
-          <div id="1232_2056" class="Pixso-frame-1232_2056">
+          <p id="1232_2055" data-reveal class="Pixso-paragraph-1232_2055">@2026  LIND · 林德创意化探索</p>
+          <div id="1232_2056" data-reveal class="Pixso-frame-1232_2056">
             <p id="1232_2057" class="Pixso-paragraph-1232_2057">小红书</p>
             <p id="1232_2058" class="Pixso-paragraph-1232_2058">Design</p>
             <p id="1232_2059" class="Pixso-paragraph-1232_2059">GitHub</p>
           </div>
-          <div id="5_1404" class="Pixso-vector-5_1404"></div>
-          <div id="1358_3157" class="Pixso-frame-1358_3157">
+          <div id="5_1404" data-reveal class="Pixso-vector-5_1404"></div>
+          <div id="1358_3157" data-reveal class="Pixso-frame-1358_3157">
             <div id="1232_2064" class="Pixso-vector-1232_2064"></div>
             <div id="11_3094" class="Pixso-vector-11_3094"></div>
           </div>
-          <div id="1232_2067" class="Pixso-text-1232_2067">
+          <div id="1232_2067" data-reveal class="Pixso-text-1232_2067">
             <p id="1232_2067_0" class="Pixso-paragraph-1232_2067_0">
 <span id="1232_2067_0_1" class="Pixso-span-1232_2067_0_1">浪潮中思考与判断力愈发不可替代，</span></p>
             <p id="1232_2067_1" class="Pixso-paragraph-1232_2067_1">
 <span id="1232_2067_1_1" class="Pixso-span-1232_2067_1_1">无比的想象力和执行力才是Ai时代的人的核心。</span></p>
           </div>
-          <div id="5_1392" class="Pixso-frame-5_1392">
+          <div id="5_1392" data-reveal class="Pixso-frame-5_1392">
             <div id="1232_2068" class="Pixso-frame-1232_2068">
               <div class="frame-content-1232_2068">
                 <p id="1232_2069" class="Pixso-paragraph-1232_2069">个人信息</p>
@@ -1001,7 +1031,7 @@ span {
             </div>
           </div>
           <div id="1232_2101" class="Pixso-rectangle-1232_2101"></div>
-          <div id="1232_2102" class="Pixso-rectangle-1232_2102"></div>
+          <div id="1232_2102" data-reveal class="Pixso-rectangle-1232_2102"></div>
         </div>
       </footer>
     </main>
@@ -1015,12 +1045,16 @@ span {
   </div>
 </div>
 <script>
-// 自适应缩放 + 滚动显现 + 鼠标视差（原生实现，零外部依赖）
+// 自适应缩放 + 滚动显现 + 卡片悬停跟随转动/颜色光效 + 箭头切换（原生实现，零外部依赖）
 (function () {
   var BASE_W = 1920, BASE_H = 4386;
   var sizer = document.querySelector('.site-sizer');
   var scroller = document.querySelector('.scroll-container');
   var vp = document.querySelector('.site-viewport');
+
+  // 3) 每次刷新强制定位到顶部
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  window.scrollTo(0, 0);
 
   function fit() {
     var w = (vp && vp.clientWidth) || window.innerWidth;
@@ -1030,16 +1064,21 @@ span {
   }
   fit();
   window.addEventListener('resize', fit);
-  window.addEventListener('load', fit);
+  window.addEventListener('load', function () { fit(); window.scrollTo(0, 0); });
 
-  // 滚动显现：元素进入视口即播放（含文字“滑到就显现”）
+  // 滚动显现：进入视口即播放；同父级兄弟按序号错峰（有节奏），亦支持 data-reveal-delay 自定义
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var targets = Array.prototype.slice.call(document.querySelectorAll('[data-reveal]'));
 
   function reveal(el) {
-    var sibs = Array.prototype.slice.call(el.parentNode.querySelectorAll(':scope > [data-reveal]'));
-    var idx = sibs.indexOf(el);
-    if (idx > 0) el.style.transitionDelay = (idx * 0.09) + 's';
+    var d = el.getAttribute('data-reveal-delay');
+    if (d != null) {
+      el.style.transitionDelay = d + 's';
+    } else {
+      var sibs = Array.prototype.slice.call(el.parentNode.querySelectorAll(':scope > [data-reveal]'));
+      var idx = sibs.indexOf(el);
+      if (idx > 0) el.style.transitionDelay = (idx * 0.1) + 's';
+    }
     el.classList.add('is-visible');
   }
 
@@ -1054,22 +1093,13 @@ span {
     targets.forEach(function (el) { io.observe(el); });
   }
 
-  // 鼠标联动视差（仅未开启“减弱动态”时）
+  // 鼠标联动视差（仅首屏文案，避免作品卡片“相邻误触”）
   if (!reduce) {
-    var pEls = Array.prototype.slice.call(document.querySelectorAll('#25_32 .works-figure, #1232_2025 > *'));
-    var depths = pEls.map(function (el) {
-      var c = el.classList;
-      if (c.contains('c-portrait')) return 10;
-      if (c.contains('c-circle')) return 14;
-      if (c.contains('c-logo')) return 6;
-      if (c.contains('c-linde')) return 5;
-      if (c.contains('c-icon1') || c.contains('c-icon2')) return 18;
-      if (el.parentElement && el.parentElement.id === '1232_2025') return 16;
-      return 26;
-    });
-    var mx = 0, my = 0, raf = null;
-    function apply() {
-      raf = null;
+    var pEls = Array.prototype.slice.call(document.querySelectorAll('#1232_2025 > *'));
+    var depths = pEls.map(function () { return 16; });
+    var mx = 0, my = 0, rafP = null;
+    function applyP() {
+      rafP = null;
       for (var i = 0; i < pEls.length; i++) {
         pEls[i].style.translate = (-mx * depths[i]) + 'px ' + (-my * depths[i]) + 'px';
       }
@@ -1077,9 +1107,104 @@ span {
     window.addEventListener('mousemove', function (e) {
       mx = (e.clientX / window.innerWidth - 0.5) * 2;
       my = (e.clientY / window.innerHeight - 0.5) * 2;
-      if (!raf) raf = requestAnimationFrame(apply);
+      if (!rafP) rafP = requestAnimationFrame(applyP);
     });
   }
+
+  // 4) 作品卡片：精确命中（穿透透明区）+ 鼠标跟随转动 + 对应颜色描边光效
+  var CARD_COLORS = {
+    'c-m40': '#9e817b', 'c-m20': '#a28c8d', 'c-0': '#80683f',
+    'c-p20': '#a28675', 'c-p40': '#a98b74'
+  };
+  var cards = Array.prototype.slice.call(document.querySelectorAll(
+    '#25_32 .c-m40, #25_32 .c-m20, #25_32 .c-0, #25_32 .c-p20, #25_32 .c-p40'
+  ));
+  cards.forEach(function (el) {
+    var cls = [].slice.call(el.classList).filter(function (c) { return c.indexOf('c-') === 0; })[0];
+    el._color = CARD_COLORS[cls] || '#caa37a';
+    var cv = document.createElement('canvas');
+    var ctx = cv.getContext('2d');
+    var drawn = false;
+    el._buildAlpha = function () {
+      if (drawn || !el.naturalWidth) return;
+      try { cv.width = el.naturalWidth; cv.height = el.naturalHeight; ctx.drawImage(el, 0, 0); drawn = true; } catch (e) {}
+    };
+    el._alphaAt = function (clientX, clientY) {
+      el._buildAlpha();
+      if (!drawn) return 255;
+      var rect = el.getBoundingClientRect();
+      if (!rect.width || !rect.height) return 0;
+      var nx = (clientX - rect.left) / rect.width * el.naturalWidth;
+      var ny = (clientY - rect.top) / rect.height * el.naturalHeight;
+      if (nx < 0 || ny < 0 || nx >= cv.width || ny >= cv.height) return 0;
+      var dt = ctx.getImageData(nx | 0, ny | 0, 1, 1).data;
+      return dt[3];
+    };
+  });
+
+  var worksArea = document.querySelector('#25_32');
+  var activeCard = null;
+  var wraf = null, wev = null;
+  function processWorkMove() {
+    wraf = null;
+    var e = wev; if (!e) return;
+    var stack = document.elementsFromPoint(e.clientX, e.clientY);
+    var hit = null;
+    for (var i = 0; i < stack.length; i++) {
+      var el = stack[i];
+      if (el && cards.indexOf(el) !== -1 && el._alphaAt(e.clientX, e.clientY) > 40) {
+        hit = el; break;
+      }
+    }
+    if (hit !== activeCard) {
+      if (activeCard) { activeCard.style.transform = ''; activeCard.style.filter = ''; activeCard.style.zIndex = ''; }
+      activeCard = hit;
+    }
+    if (hit) {
+      var rect = hit.getBoundingClientRect();
+      var cx = rect.left + rect.width / 2;
+      var cy = rect.top + rect.height / 2;
+      var rx = ((e.clientY - cy) / (rect.height / 2)) * -10;
+      var ry = ((e.clientX - cx) / (rect.width / 2)) * 12;
+      hit.style.transform = 'perspective(800px) rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg)';
+      hit.style.filter = 'drop-shadow(0 0 18px ' + hit._color + ') brightness(1.08)';
+      hit.style.zIndex = '40';
+    }
+  }
+  if (worksArea && !reduce) {
+    worksArea.addEventListener('mousemove', function (e) { wev = e; if (!wraf) wraf = requestAnimationFrame(processWorkMove); });
+    worksArea.addEventListener('mouseleave', function () {
+      cards.forEach(function (el) { el.style.transform = ''; el.style.filter = ''; el.style.zIndex = ''; el.style.scale = ''; });
+      activeCard = null;
+      if (hasFocus) applyFocus();
+    });
+  }
+
+  // 5) 左右箭头：点击动效（:active 缩放）+ 切换“聚焦”卡片（默认不放大，保持扇形均衡；点击后才抬起对应卡片）
+  var navPrev = document.querySelector('.works-nav.prev');
+  var navNext = document.querySelector('.works-nav.next');
+  var focusIdx = 2; // 当前聚焦索引（中间卡片）
+  var hasFocus = false;
+  function applyFocus() {
+    cards.forEach(function (el, i) {
+      if (hasFocus && i === focusIdx) {
+        el.style.zIndex = '45';
+        el.style.filter = 'drop-shadow(0 0 20px ' + el._color + ') brightness(1.1)';
+        el.style.scale = '1.05';
+      } else {
+        el.style.zIndex = '';
+        el.style.filter = '';
+        el.style.scale = '';
+      }
+    });
+  }
+  function setFocus(idx) {
+    focusIdx = (idx + cards.length) % cards.length;
+    hasFocus = true;
+    applyFocus();
+  }
+  if (navPrev) navPrev.addEventListener('click', function () { setFocus(focusIdx - 1); });
+  if (navNext) navNext.addEventListener('click', function () { setFocus(focusIdx + 1); });
 })();
 </script>
 
