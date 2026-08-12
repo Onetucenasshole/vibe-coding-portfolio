@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LIND Portfolio</title>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
   <style>
 @font-face {
 	font-family: 'HarmonyOS Sans SC';
@@ -818,19 +819,12 @@ span {
 
   
   /* === works section figures (extracted from inline styles) === */
-  .works-figure { position: absolute; }
-  /* 类似箭头的装饰图标（works_icon_1/2 + 5_1404 Group SVG）点击反馈：缩放 + 亮度脉冲 */
-  .works-figure.c-icon1, .works-figure.c-icon2, .Pixso-vector-5_1404 {
-    cursor: pointer;
-    transition: transform .22s cubic-bezier(.22,.61,.36,1), filter .22s ease;
-  }
-  .works-figure.c-icon1:hover, .works-figure.c-icon2:hover, .Pixso-vector-5_1404:hover {
-    transform: scale(1.08);
-    filter: brightness(1.15) drop-shadow(0 0 10px rgba(234,158,98,.6));
-  }
-  .works-figure.c-icon1:active, .works-figure.c-icon2:active, .Pixso-vector-5_1404:active {
-    transform: scale(0.82);
-    filter: brightness(1.3) drop-shadow(0 0 14px rgba(234,158,98,.85));
+  .works-figure { position: absolute; transform: translateZ(0); will-change: transform, box-shadow; }
+  /* 描边光效基础态（透明描边，由 GSAP 实时设色与宽度；预留 --card-color 变量） */
+  .works-figure.c-m40, .works-figure.c-m20, .works-figure.c-0,
+  .works-figure.c-p20, .works-figure.c-p40 {
+    box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent;
+    transition: box-shadow .25s ease-out;
   }
   .c-m40 { left:-46.5px; top:194.92px; width:434.5px; height:442.5px; }
   .c-m20 { left:174.5px; top:89.3px; width:397px; height:435px; }
@@ -1111,7 +1105,10 @@ span {
     });
   }
 
-  // 4) 作品卡片：精确命中（穿透透明区）+ 鼠标跟随转动 + 对应颜色描边光效
+  // 4) 作品卡片：精确命中（穿透透明区）+ GSAP 驱动的跟随转动 + 对应颜色描边光效
+  //    a) gsap.quickTo 高频无延迟驱动 rotationX/rotationY（perspective 800）
+  //    b) alpha 测试（每卡离屏 canvas）保证只有指针落在卡片不透明像素的那张生效
+  //    c) box-shadow 0 0 0 2px <色>, 0 0 30px <色> 实现"描边光效"（内描边 + 外发光）
   var CARD_COLORS = {
     'c-m40': '#9e817b', 'c-m20': '#a28c8d', 'c-0': '#80683f',
     'c-p20': '#a28675', 'c-p40': '#a98b74'
@@ -1122,6 +1119,7 @@ span {
   cards.forEach(function (el) {
     var cls = [].slice.call(el.classList).filter(function (c) { return c.indexOf('c-') === 0; })[0];
     el._color = CARD_COLORS[cls] || '#caa37a';
+    el.style.setProperty('--card-color', el._color);
     var cv = document.createElement('canvas');
     var ctx = cv.getContext('2d');
     var drawn = false;
@@ -1140,41 +1138,96 @@ span {
       var dt = ctx.getImageData(nx | 0, ny | 0, 1, 1).data;
       return dt[3];
     };
+    if (window.gsap) {
+      gsap.set(el, { transformPerspective: 800, transformOrigin: '50% 50%' });
+    }
   });
 
   var worksArea = document.querySelector('#25_32');
   var activeCard = null;
-  var wraf = null, wev = null;
-  function processWorkMove() {
-    wraf = null;
-    var e = wev; if (!e) return;
-    var stack = document.elementsFromPoint(e.clientX, e.clientY);
-    var hit = null;
-    for (var i = 0; i < stack.length; i++) {
-      var el = stack[i];
-      if (el && cards.indexOf(el) !== -1 && el._alphaAt(e.clientX, e.clientY) > 40) {
-        hit = el; break;
-      }
-    }
-    if (hit !== activeCard) {
-      if (activeCard) { activeCard.style.transform = ''; activeCard.style.filter = ''; activeCard.style.zIndex = ''; }
-      activeCard = hit;
-    }
-    if (hit) {
-      var rect = hit.getBoundingClientRect();
-      var cx = rect.left + rect.width / 2;
-      var cy = rect.top + rect.height / 2;
-      var rx = ((e.clientY - cy) / (rect.height / 2)) * -10;
-      var ry = ((e.clientX - cx) / (rect.width / 2)) * 12;
-      hit.style.transform = 'perspective(800px) rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg)';
-      hit.style.filter = 'drop-shadow(0 0 18px ' + hit._color + ') brightness(1.08)';
-      hit.style.zIndex = '40';
+  var pendingEvent = null, tickerFn = null;
+
+  function lightShadow(c, on) {
+    if (!c) return;
+    if (on) {
+      c.style.boxShadow = '0 0 0 2px ' + c._color + ', 0 0 30px ' + c._color + ', 0 0 60px ' + c._color + '55';
+    } else {
+      c.style.boxShadow = '0 0 0 0 transparent, 0 0 0 0 transparent';
     }
   }
-  if (worksArea && !reduce) {
+
+  if (worksArea && !reduce && window.gsap) {
+    tickerFn = function () {
+      var e = pendingEvent; if (!e) return;
+      pendingEvent = null;
+      var stack = document.elementsFromPoint(e.clientX, e.clientY);
+      var hit = null;
+      for (var i = 0; i < stack.length; i++) {
+        var el = stack[i];
+        if (el && cards.indexOf(el) !== -1 && el._alphaAt(e.clientX, e.clientY) > 40) { hit = el; break; }
+      }
+      if (hit !== activeCard) {
+        if (activeCard) {
+          gsap.to(activeCard, { rotationX: 0, rotationY: 0, scale: 1, zIndex: 1, duration: 0.45, ease: 'power3.out' });
+          lightShadow(activeCard, false);
+        }
+        activeCard = hit;
+        if (hit) { gsap.set(hit, { zIndex: 40 }); lightShadow(hit, true); }
+      }
+      if (hit) {
+        var rect = hit.getBoundingClientRect();
+        var cx = rect.left + rect.width / 2;
+        var cy = rect.top + rect.height / 2;
+        var rx = ((e.clientY - cy) / (rect.height / 2)) * -10;
+        var ry = ((e.clientX - cx) / (rect.width / 2)) * 12;
+        if (!hit._qrx) hit._qrx = gsap.quickTo(hit, 'rotationX', { duration: 0.35, ease: 'power3.out' });
+        if (!hit._qry) hit._qry = gsap.quickTo(hit, 'rotationY', { duration: 0.35, ease: 'power3.out' });
+        if (!hit._qsc) hit._qsc = gsap.quickTo(hit, 'scale',     { duration: 0.35, ease: 'power3.out' });
+        hit._qrx(rx);
+        hit._qry(ry);
+        hit._qsc(1.04);
+      }
+    };
+    gsap.ticker.add(tickerFn);
+    worksArea.addEventListener('mousemove', function (e) { pendingEvent = e; });
+    worksArea.addEventListener('mouseleave', function () {
+      pendingEvent = null;
+      if (activeCard) {
+        gsap.to(activeCard, { rotationX: 0, rotationY: 0, scale: 1, zIndex: 1, duration: 0.5, ease: 'power3.out' });
+        lightShadow(activeCard, false);
+        activeCard = null;
+      }
+    });
+  } else if (worksArea && !reduce) {
+    // fallback：GSAP 未加载时的纯 CSS 实现
+    var wraf = null, wev = null;
+    function processWorkMove() {
+      wraf = null;
+      var e = wev; if (!e) return;
+      var stack = document.elementsFromPoint(e.clientX, e.clientY);
+      var hit = null;
+      for (var i = 0; i < stack.length; i++) {
+        var el = stack[i];
+        if (el && cards.indexOf(el) !== -1 && el._alphaAt(e.clientX, e.clientY) > 40) { hit = el; break; }
+      }
+      if (hit !== activeCard) {
+        if (activeCard) { activeCard.style.transform = ''; activeCard.style.boxShadow = ''; activeCard.style.zIndex = ''; }
+        activeCard = hit;
+      }
+      if (hit) {
+        var rect = hit.getBoundingClientRect();
+        var cx = rect.left + rect.width / 2;
+        var cy = rect.top + rect.height / 2;
+        var rx = ((e.clientY - cy) / (rect.height / 2)) * -10;
+        var ry = ((e.clientX - cx) / (rect.width / 2)) * 12;
+        hit.style.transform = 'perspective(800px) rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg) scale(1.04)';
+        hit.style.boxShadow = '0 0 0 2px ' + hit._color + ', 0 0 30px ' + hit._color + ', 0 0 60px ' + hit._color + '55';
+        hit.style.zIndex = '40';
+      }
+    }
     worksArea.addEventListener('mousemove', function (e) { wev = e; if (!wraf) wraf = requestAnimationFrame(processWorkMove); });
     worksArea.addEventListener('mouseleave', function () {
-      cards.forEach(function (el) { el.style.transform = ''; el.style.filter = ''; el.style.zIndex = ''; el.style.scale = ''; });
+      cards.forEach(function (el) { el.style.transform = ''; el.style.boxShadow = ''; el.style.zIndex = ''; });
       activeCard = null;
     });
   }
