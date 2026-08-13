@@ -1220,9 +1220,9 @@ span {
           var right = cols[c + 1] && cols[c + 1][rIdx];
           var down = cols[c] && cols[c][rIdx + 1];
           var prox = m.active ? Math.max(0, 1 - Math.sqrt((m.x - d.x) * (m.x - d.x) + (m.y - d.y) * (m.y - d.y)) / R) : 0;
-          ctx.globalAlpha = 0.06 + prox * 0.7;
+          ctx.globalAlpha = 0.14 + prox * 0.7;
           ctx.strokeStyle = lineColor;
-          ctx.lineWidth = 0.5 + prox * 1.5;
+          ctx.lineWidth = 0.7 + prox * 1.8;
           if (right) { ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(right.x, right.y); ctx.stroke(); }
           if (down) { ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(down.x, down.y); ctx.stroke(); }
         }
@@ -1230,9 +1230,9 @@ span {
       for (var i2 = 0; i2 < dots.length; i2++) {
         var d2 = dots[i2];
         var prox2 = m.active ? Math.max(0, 1 - Math.sqrt((m.x - d2.x) * (m.x - d2.x) + (m.y - d2.y) * (m.y - d2.y)) / R) : 0;
-        ctx.globalAlpha = 0.22 + prox2 * 0.78;
+        ctx.globalAlpha = 0.45 + prox2 * 0.55;
         ctx.fillStyle = dotColor;
-        ctx.beginPath(); ctx.arc(d2.x, d2.y, 0.8 + prox2 * 2.2, 0, 2 * Math.PI); ctx.fill();
+        ctx.beginPath(); ctx.arc(d2.x, d2.y, 1.4 + prox2 * 2.6, 0, 2 * Math.PI); ctx.fill();
       }
       if (trail) {
         var now = performance.now();
