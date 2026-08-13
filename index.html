@@ -113,6 +113,16 @@ span {
   transform: translateX(calc(-50% + 0px)) translateY(calc(-50% + -1652px));
 }
 
+  /* 首屏 Kinetic Grid 画布：透明背景，覆盖在 hero 背景图之上、文字/矩形之下 */
+  .hero-kinetic {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1920px;
+    height: 1080px;
+    pointer-events: none;
+  }
+
 .Pixso-rectangle-25_23 {
   left: 0px;
   top: 0px;
@@ -905,6 +915,7 @@ span {
     <main id="1232_1993" class="Pixso-frame-1232_1993">
       <div id="1232_1996" class="Pixso-frame-1232_1996">
         <div id="25_23" class="Pixso-rectangle-25_23" data-anim-load></div>
+        <canvas id="hero-kinetic" class="hero-kinetic"></canvas>
         <nav id="1298_2794" class="Pixso-frame-1298_2794" data-anim-load>
           <div class="frame-content-1298_2794">
             <div id="1232_2001" class="Pixso-frame-1232_2001">
@@ -1113,6 +1124,134 @@ span {
       if (!rafP) rafP = requestAnimationFrame(applyP);
     });
   }
+
+  // 5) 首屏 Kinetic Grid（Originkit KineticGrid 组件 vanilla 移植）
+  //    透明网格点随光标吸附 + 白色拖尾；覆盖在 hero 背景图之上、文字/矩形之下。
+  //    坐标通过 canvas.getBoundingClientRect 比例换算，自动规避 .scroll-container 的 scale 变换。
+  (function initKineticGrid() {
+    var host = document.getElementById('1232_1996'); // hero 容器，收鼠标事件
+    var canvas = document.getElementById('hero-kinetic');
+    if (!host || !canvas) return;
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    var HERO_W = 1920, HERO_H = 1080;
+    var DPR = Math.min(window.devicePixelRatio || 1, 2);
+    // 原组件预览为 600×600；首屏宽 1920，按比例放大 spacing/radius 保持同样的网格密度与吸附范围
+    var kf = HERO_W / 600;
+    var GAP = Math.round(18 * kf);   // ≈58
+    var R = Math.round(70 * kf);     // ≈224
+    var PULL = (Math.max(1, Math.min(10, 7)) / 10) * 4; // strength 7 -> 2.8
+    var dotColor = '#FFFFFF';
+    var lineColor = '#BE7E27';       // 金色描边线（匹配预览 + 品牌色）
+    var trailColor = '#FFFFFF';
+    var trail = true;
+
+    var W = HERO_W, H = HERO_H;
+    var cols = [], dots = [];
+
+    function build() {
+      canvas.width = Math.floor(W * DPR);
+      canvas.height = Math.floor(H * DPR);
+      canvas.style.width = W + 'px';
+      canvas.style.height = H + 'px';
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      cols = []; dots = [];
+      var nCols = Math.floor(W / GAP) + 2;
+      var nRows = Math.floor(H / GAP) + 2;
+      for (var c = 0; c < nCols; c++) {
+        var col = [];
+        for (var rIdx = 0; rIdx < nRows; rIdx++) {
+          var hx = c * GAP, hy = rIdx * GAP;
+          var d = { hx: hx, hy: hy, x: hx, y: hy, vx: 0, vy: 0 };
+          col.push(d); dots.push(d);
+        }
+        cols.push(col);
+      }
+    }
+    build();
+
+    var mouse = { x: -9999, y: -9999, active: false };
+    var trailPts = [];
+
+    function toLocal(cx, cy) {
+      var rect = canvas.getBoundingClientRect();
+      return [
+        (cx - rect.left) * (W / rect.width),
+        (cy - rect.top) * (H / rect.height)
+      ];
+    }
+    function setMouse(cx, cy) {
+      var p = toLocal(cx, cy);
+      mouse.x = p[0]; mouse.y = p[1]; mouse.active = true;
+      var now = performance.now();
+      trailPts.push({ x: p[0], y: p[1], t: now });
+      if (trailPts.length > 80) trailPts.shift();
+    }
+    host.addEventListener('mousemove', function (e) { setMouse(e.clientX, e.clientY); });
+    host.addEventListener('mouseleave', function () { mouse.active = false; mouse.x = -9999; mouse.y = -9999; });
+    host.addEventListener('touchmove', function (e) { var t = e.touches[0]; if (t) setMouse(t.clientX, t.clientY); }, { passive: true });
+    host.addEventListener('touchend', function () { mouse.active = false; mouse.x = -9999; mouse.y = -9999; });
+
+    var raf = 0;
+    function frame() {
+      ctx.clearRect(0, 0, W, H);
+      var m = mouse;
+      for (var i = 0; i < dots.length; i++) {
+        var d = dots[i];
+        var ax = (d.hx - d.x) * 0.08;
+        var ay = (d.hy - d.y) * 0.08;
+        if (m.active) {
+          var dx = m.x - d.x, dy = m.y - d.y;
+          var dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < R && dist > 0.001) {
+            var f = (1 - dist / R) * PULL;
+            ax += (dx / dist) * f;
+            ay += (dy / dist) * f;
+          }
+        }
+        d.vx = (d.vx + ax) * 0.82;
+        d.vy = (d.vy + ay) * 0.82;
+        d.x += d.vx; d.y += d.vy;
+      }
+      for (var c = 0; c < cols.length; c++) {
+        for (var rIdx = 0; rIdx < cols[c].length; rIdx++) {
+          var d = cols[c][rIdx];
+          var right = cols[c + 1] && cols[c + 1][rIdx];
+          var down = cols[c] && cols[c][rIdx + 1];
+          var prox = m.active ? Math.max(0, 1 - Math.sqrt((m.x - d.x) * (m.x - d.x) + (m.y - d.y) * (m.y - d.y)) / R) : 0;
+          ctx.globalAlpha = 0.06 + prox * 0.7;
+          ctx.strokeStyle = lineColor;
+          ctx.lineWidth = 0.5 + prox * 1.5;
+          if (right) { ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(right.x, right.y); ctx.stroke(); }
+          if (down) { ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(down.x, down.y); ctx.stroke(); }
+        }
+      }
+      for (var i2 = 0; i2 < dots.length; i2++) {
+        var d2 = dots[i2];
+        var prox2 = m.active ? Math.max(0, 1 - Math.sqrt((m.x - d2.x) * (m.x - d2.x) + (m.y - d2.y) * (m.y - d2.y)) / R) : 0;
+        ctx.globalAlpha = 0.22 + prox2 * 0.78;
+        ctx.fillStyle = dotColor;
+        ctx.beginPath(); ctx.arc(d2.x, d2.y, 0.8 + prox2 * 2.2, 0, 2 * Math.PI); ctx.fill();
+      }
+      if (trail) {
+        var now = performance.now();
+        ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        for (var ti = 1; ti < trailPts.length; ti++) {
+          var a = trailPts[ti - 1], b = trailPts[ti];
+          var age = now - b.t;
+          if (age > 260) continue;
+          ctx.globalAlpha = Math.max(0, 1 - age / 260) * 0.85;
+          ctx.strokeStyle = trailColor;
+          ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+        }
+      }
+      ctx.globalAlpha = 1;
+      raf = requestAnimationFrame(frame);
+    }
+    raf = requestAnimationFrame(frame);
+  })();
 
   // 4) 作品卡片：精确命中（穿透透明区）+ GSAP 驱动的跟随转动 + 对应颜色描边光效
   //    a) gsap.quickTo 高频无延迟驱动 rotationX/rotationY（perspective 800）
