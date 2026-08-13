@@ -123,6 +123,17 @@ span {
     pointer-events: none;
   }
 
+  /* 首屏点击动效叠加层：透明、不拦截点击，仅承载 sniper 等点击特效，随 hero overflow:hidden 裁剪在首屏内 */
+  .hero-clickfx {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1920px;
+    height: 1080px;
+    pointer-events: none;
+    overflow: visible;
+  }
+
 .Pixso-rectangle-25_23 {
   left: 0px;
   top: 0px;
@@ -939,6 +950,7 @@ span {
           <div id="1232_2027" data-reveal data-reveal-delay="0.4s" class="Pixso-rectangle-1232_2027" ></div>
           <div id="1232_2028" data-reveal data-reveal-delay="0.5s" class="Pixso-rectangle-1232_2028"></div>
         </div>
+        <div id="hero-clickfx" class="hero-clickfx"></div>
       </div>
       <div id="11_3097" class="Pixso-vector-11_3097">
         <div id="25_32" class="Pixso-frame-25_32" style='position:absolute; left:352.06px; top:92.28px; width:1215.88px; height:2168.44px;'>
@@ -1383,6 +1395,202 @@ span {
       activeCard = null;
     });
   }
+})();
+</script>
+
+<!-- Click Effects — Originkit MouseEffects 移植（vanilla + GSAP）。叠加在首屏 #hero-clickfx 层，仅首屏内点击触发，背景图保留。6 种模式全实现。配置见 CFG：mode / color / showLabel 等。 -->
+<script>
+/* Click Effects — Originkit MouseEffects vanilla port (GSAP), localized to hero #hero-clickfx */
+(function () {
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce || !window.gsap) return;
+
+  var CFG = {
+    color: '#ffffff',          // 动效颜色（站点金色可用 '#BE7E27'）
+    mode: 'sniper',            // rings | burst | particles | crosshair | wavy | sniper
+    duration: 1,
+    strokeWidth: 0.5,
+    effectSize: 150,
+    rotation: 35,
+    showLabel: false,          // 是否在页面中央常驻显示 "Click Anywhere" 提示
+    labelText: 'Click Anywhere',
+    labelColor: '#ffffff'
+  };
+  var color = CFG.color, duration = CFG.duration, strokeWidth = CFG.strokeWidth,
+      effectSize = CFG.effectSize, rotation = CFG.rotation;
+
+  var SVGNS = 'http://www.w3.org/2000/svg';
+  function svgEl(tag, attrs) {
+    var e = document.createElementNS(SVGNS, tag);
+    if (attrs) for (var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+  function applyStyle(node, st) { for (var k in st) node.style[k] = st[k]; }
+  function svgStyle(x, y) {
+    return {
+      position: 'absolute',
+      left: (x - effectSize / 2) + 'px',
+      top: (y - effectSize / 2) + 'px',
+      width: effectSize + 'px',
+      height: effectSize + 'px',
+      pointerEvents: 'none',
+      overflow: 'visible',
+      transform: 'rotate(' + rotation + 'deg)',
+      transformOrigin: 'center'
+    };
+  }
+
+  var layer = document.getElementById('hero-clickfx');
+  if (!layer) return;
+
+  if (CFG.showLabel) {
+    var label = document.createElement('div');
+    applyStyle(label, {
+      position: 'absolute', left: '50%', top: '50%',
+      transform: 'translate(-50%, -50%)', whiteSpace: 'nowrap',
+      pointerEvents: 'none', userSelect: 'none',
+      fontFamily: 'Inter, sans-serif', fontSize: '60px', fontWeight: '600',
+      color: CFG.labelColor
+    });
+    label.textContent = CFG.labelText;
+    layer.appendChild(label);
+  }
+
+  function spawnRings(x, y) {
+    var svg = svgEl('svg'); applyStyle(svg, svgStyle(x, y));
+    var c = svgEl('circle', { cx: effectSize / 2, cy: effectSize / 2, r: effectSize / 4, fill: 'none', stroke: color, 'stroke-width': strokeWidth });
+    svg.appendChild(c); layer.appendChild(svg);
+    gsap.set(svg, { scale: 0.5, rotation: rotation });
+    gsap.timeline()
+      .to(svg, { scale: 2, duration: duration, ease: 'power3.out', onComplete: function () { svg.remove(); } }, 0)
+      .to(c, { attr: { 'stroke-width': 0 }, duration: duration, ease: 'power3.out' }, 0)
+      .to(svg, { opacity: 0, duration: duration * 0.2, ease: 'linear' }, duration * 0.8);
+  }
+
+  function spawnBurst(x, y) {
+    var svg = svgEl('svg'); applyStyle(svg, svgStyle(x, y)); layer.appendChild(svg);
+    [45, 80, 115, 150].forEach(function (deg) {
+      var line = svgEl('line', { stroke: color, 'stroke-width': strokeWidth, 'stroke-linecap': 'square' });
+      svg.appendChild(line);
+      var a = deg * Math.PI / 180, cx = effectSize / 2, cy = effectSize / 2;
+      var sx = cx + effectSize * 0.1 * Math.cos(a), sy = cy - effectSize * 0.1 * Math.sin(a);
+      var ex = cx + effectSize * 0.25 * Math.cos(a), ey = cy - effectSize * 0.25 * Math.sin(a);
+      gsap.set(line, { attr: { x1: sx, y1: sy, x2: ex, y2: ey } });
+      gsap.timeline()
+        .to(line, { attr: { x1: ex, y1: ey, x2: ex, y2: ey }, translateX: (effectSize / 4) * Math.cos(a), translateY: -(effectSize / 4) * Math.sin(a), duration: duration, ease: 'power2.out', onComplete: function () { if (svg.parentNode) svg.remove(); } }, 0)
+        .to(line, { attr: { 'stroke-width': 0 }, duration: duration * 0.4, ease: 'linear' }, duration * 0.6);
+    });
+  }
+
+  function spawnParticles(x, y) {
+    for (var i = 0; i < 8; i++) {
+      var angle = i * 45 * Math.PI / 180;
+      var dist = effectSize * 0.2 + Math.random() * (effectSize * 0.3);
+      var p = document.createElement('div');
+      applyStyle(p, {
+        position: 'absolute', transformOrigin: 'center',
+        left: (x - strokeWidth / 2) + 'px', top: (y - strokeWidth / 2) + 'px',
+        width: strokeWidth + 'px', height: strokeWidth + 'px',
+        backgroundColor: color, borderRadius: '50%', pointerEvents: 'none',
+        transform: 'rotate(' + rotation + 'deg)'
+      });
+      layer.appendChild(p);
+      var fx = x + Math.cos(angle) * dist, fy = y + Math.sin(angle) * dist;
+      gsap.set(p, { left: (x - strokeWidth / 2) + 'px', top: (y - strokeWidth / 2) + 'px', width: 0, height: 0 });
+      gsap.timeline()
+        .to(p, { width: strokeWidth, height: strokeWidth, duration: duration * 0.2, ease: 'power1.out' })
+        .to(p, { left: (fx - strokeWidth / 2) + 'px', top: (fy - strokeWidth / 2) + 'px', duration: duration * 0.4, ease: 'power1.out' }, duration * 0.2)
+        .to(p, { width: 0, height: 0, left: fx + 'px', top: fy + 'px', duration: duration * 0.4, ease: 'linear', onComplete: function () { p.remove(); } }, duration * 0.6);
+    }
+  }
+
+  function spawnCrosshair(x, y) {
+    var svg = svgEl('svg'); applyStyle(svg, svgStyle(x, y)); layer.appendChild(svg);
+    [0, 90, 180, 270].forEach(function (deg) {
+      var line = svgEl('line', { stroke: color, 'stroke-width': strokeWidth, 'stroke-linecap': 'square' });
+      svg.appendChild(line);
+      var a = deg * Math.PI / 180, cx = effectSize / 2, cy = effectSize / 2, L = effectSize * 0.3;
+      var sx = cx + 20 * Math.cos(a), sy = cy - 20 * Math.sin(a);
+      var ex = cx + (20 + L) * Math.cos(a), ey = cy - (20 + L) * Math.sin(a);
+      gsap.set(line, { attr: { x1: sx, y1: sy, x2: cx, y2: cy } });
+      gsap.timeline()
+        .to(line, { attr: { x1: ex, y1: ey, x2: ex, y2: ey }, duration: duration * 0.8, ease: 'power1.out' })
+        .to(line, { attr: { 'stroke-width': 0 }, duration: duration * 0.6, ease: 'linear', onComplete: function () { if (svg.parentNode) svg.remove(); } }, duration * 0.4);
+    });
+  }
+
+  function spawnWavy(x, y) {
+    var svg = svgEl('svg'); applyStyle(svg, svgStyle(x, y));
+    [45, 90, 135, 180].forEach(function (deg) {
+      var rad = deg * Math.PI / 180, cx = effectSize / 2, cy = effectSize / 2;
+      var sr = effectSize * 0.1, er = effectSize * 0.5;
+      var sx = cx + sr * Math.cos(rad), sy = cy - sr * Math.sin(rad);
+      var ex = cx + er * Math.cos(rad), ey = cy - er * Math.sin(rad);
+      var mx = (sx + ex) / 2, my = (sy + ey) / 2, wo = effectSize * 0.05;
+      var c1x = mx + wo * Math.cos(rad + Math.PI / 2), c1y = my - wo * Math.sin(rad + Math.PI / 2);
+      var d = 'M ' + sx + ' ' + sy + ' Q ' + c1x + ' ' + c1y + ' ' + mx + ' ' + my + ' T ' + ex + ' ' + ey;
+      svg.appendChild(svgEl('path', { d: d, stroke: color, 'stroke-width': strokeWidth, 'stroke-linecap': 'round', fill: 'none' }));
+    });
+    layer.appendChild(svg);
+    var paths = svg.querySelectorAll('path');
+    paths.forEach(function (path) {
+      var len = path.getTotalLength();
+      gsap.set(path, { strokeDasharray: '1, ' + len, strokeDashoffset: 0 });
+      gsap.timeline()
+        .to(path, { strokeDasharray: len + ', ' + len, strokeDashoffset: -len, duration: duration, ease: 'power1.out' })
+        .to(path, { attr: { 'stroke-width': 0 }, duration: duration * 0.4, ease: 'linear' }, duration * 0.6);
+    });
+    gsap.delayedCall(duration, function () { if (svg.parentNode) svg.remove(); });
+  }
+
+  function spawnSniper(x, y) {
+    var wrap = document.createElement('div');
+    applyStyle(wrap, { position: 'absolute', left: '0', top: '0' });
+    layer.appendChild(wrap);
+    var svg = svgEl('svg'); applyStyle(svg, svgStyle(x, y));
+    [0, 90, 180, 270].forEach(function (deg) {
+      var line = svgEl('line', { stroke: color, 'stroke-width': strokeWidth, 'stroke-linecap': 'square' });
+      svg.appendChild(line);
+      var a = deg * Math.PI / 180, cx = effectSize / 2, cy = effectSize / 2, L = effectSize * 0.2;
+      var sx = cx + 5 * Math.cos(a), sy = cy - 5 * Math.sin(a);
+      var ex = cx + (5 + L) * Math.cos(a), ey = cy - (5 + L) * Math.sin(a);
+      gsap.set(line, { attr: { x1: sx, y1: sy, x2: ex, y2: ey } });
+      gsap.timeline()
+        .to(line, { attr: { x1: ex, y1: ey, x2: ex, y2: ey }, translateX: (5 + L) * Math.cos(a), translateY: -(5 + L) * Math.sin(a), duration: duration, ease: 'power2.out' })
+        .to(line, { attr: { 'stroke-width': 0 }, duration: duration * 0.4, ease: 'linear' }, duration * 0.6);
+    });
+    wrap.appendChild(svg);
+    [Math.PI / 3, 2 * Math.PI / 3, 4 * Math.PI / 3, 5 * Math.PI / 3, Math.PI / 6, 5 * Math.PI / 6, 7 * Math.PI / 6, 11 * Math.PI / 6].forEach(function (angle) {
+      var p = document.createElement('div');
+      applyStyle(p, {
+        position: 'absolute', left: (x - strokeWidth / 2) + 'px', top: (y - strokeWidth / 2) + 'px',
+        width: strokeWidth + 'px', height: strokeWidth + 'px', backgroundColor: color,
+        pointerEvents: 'none', transformOrigin: 'center'
+      });
+      wrap.appendChild(p);
+      gsap.set(p, { x: 0, y: 0, rotation: rotation, width: strokeWidth, height: strokeWidth });
+      gsap.timeline()
+        .to(p, { x: Math.cos(angle) * (effectSize * 0.4), y: Math.sin(angle) * (effectSize * 0.4), duration: duration, ease: 'power2.out', onComplete: function () { if (wrap.parentNode) wrap.remove(); } }, 0)
+        .to(p, { width: 0, height: 0, duration: duration * 0.4, ease: 'linear' }, duration * 0.6);
+    });
+  }
+
+  document.addEventListener('click', function (e) {
+    var rect = layer.getBoundingClientRect();
+    var sx = rect.width / 1920, sy = rect.height / 1080;
+    if (!sx || !sy) return;
+    var dx = (e.clientX - rect.left) / sx;
+    var dy = (e.clientY - rect.top) / sy;
+    if (dx < 0 || dx > 1920 || dy < 0 || dy > 1080) return;
+    switch (CFG.mode) {
+      case 'rings': spawnRings(dx, dy); break;
+      case 'burst': spawnBurst(dx, dy); break;
+      case 'particles': spawnParticles(dx, dy); break;
+      case 'crosshair': spawnCrosshair(dx, dy); break;
+      case 'wavy': spawnWavy(dx, dy); break;
+      default: spawnSniper(dx, dy);
+    }
+  });
 })();
 </script>
 
